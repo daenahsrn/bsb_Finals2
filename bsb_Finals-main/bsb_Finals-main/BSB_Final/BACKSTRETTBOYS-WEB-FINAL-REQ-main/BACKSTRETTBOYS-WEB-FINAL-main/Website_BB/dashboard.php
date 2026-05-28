@@ -1231,6 +1231,28 @@ if (isset($_GET['logout'])) {
                 </div>
             </div>
 
+            <!-- Albums Section -->
+            <div class="content-card" id="albums-section">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-compact-disc"></i>
+                        Albums Management
+                    </h2>
+                    <button class="add-new-btn" onclick="openAlbumModal()">
+                        <i class="fas fa-plus"></i> Add Album
+                    </button>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <input type="text" id="albumSearch" placeholder="Search albums..." onkeyup="searchAlbums()" 
+                           style="width:100%;padding:12px;border-radius:8px;border:1px solid rgba(139, 92, 246, 0.3);background:rgba(139, 92, 246, 0.05);color:#fff;">
+                </div>
+
+                <div class="albums-grid" id="albumsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;">
+                    <!-- Albums will be loaded dynamically -->
+                </div>
+            </div>
+
             <!-- Top Hits Section -->
             <div class="content-card" id="tophits-section">
                 <div class="card-header">
@@ -1335,48 +1357,39 @@ if (isset($_GET['logout'])) {
                         <input type="text" class="form-input" id="memberName" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Email *</label>
-                        <input type="email" class="form-input" id="memberEmail" required>
+                        <label class="form-label">Stage Name</label>
+                        <input type="text" class="form-input" id="memberStageName">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Favorite Member *</label>
-                        <select class="form-select" id="memberFavorite" required>
-                            <option value="">Select...</option>
-                            <option value="Nick Carter">Nick Carter</option>
-                            <option value="Kevin Richardson">Kevin Richardson</option>
-                            <option value="AJ McLean">AJ McLean</option>
-                            <option value="Howie Dorough">Howie Dorough</option>
-                            <option value="Brian Littrell">Brian Littrell</option>
-                        </select>
+                        <label class="form-label">Birthdate</label>
+                        <input type="date" class="form-input" id="memberBirthdate">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Status *</label>
-                        <select class="form-select" id="memberStatus" required>
-                            <option value="active">Active</option>
-                            <option value="premium">Premium</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
+                        <label class="form-label">Nationality</label>
+                        <input type="text" class="form-input" id="memberNationality">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Join Date</label>
-                        <input type="date" class="form-input" id="memberJoinDate">
+                        <label class="form-label">Position</label>
+                        <select class="form-select" id="memberPosition">
+                            <option value="Vocalist">Vocalist</option>
+                            <option value="Lead Vocalist">Lead Vocalist</option>
+                            <option value="Rapper">Rapper</option>
+                            <option value="Dancer">Dancer</option>
+                            <option value="Multi-talented">Multi-talented</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Member Type</label>
-                        <select class="form-select" id="memberType">
-                            <option value="fan">Fan</option>
-                            <option value="superfan">Super Fan</option>
-                            <option value="vip">VIP</option>
-                        </select>
+                        <label class="form-label">Profile Image</label>
+                        <input type="file" class="form-input" id="memberProfileImg" accept="image/*">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Notes</label>
-                    <textarea class="form-textarea" id="memberNotes" placeholder="Additional notes about this member..."></textarea>
+                    <label class="form-label">Bio</label>
+                    <textarea class="form-textarea" id="memberBio" placeholder="Write member biography..."></textarea>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-cancel" onclick="closeMemberModal()">Cancel</button>
@@ -1425,6 +1438,46 @@ if (isset($_GET['logout'])) {
                     <i class="fas fa-save"></i> Save Changes
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Album Modal -->
+    <div class="modal-overlay" id="albumModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-compact-disc"></i>
+                    <span id="albumModalTitle">Edit Album</span>
+                </h3>
+                <button class="close-modal" onclick="closeAlbumModal()">&times;</button>
+            </div>
+            <form id="albumForm" onsubmit="saveAlbum(event)">
+                <input type="hidden" id="albumId">
+                <div class="form-group">
+                    <label class="form-label">Album Title *</label>
+                    <input type="text" class="form-input" id="albumTitle" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Release Date</label>
+                        <input type="date" class="form-input" id="albumRelease">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cover Image</label>
+                        <input type="file" class="form-input" id="albumCoverImg" accept="image/*">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="albumDescription" placeholder="Album description..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="closeAlbumModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Save Album
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1498,72 +1551,80 @@ if (isset($_GET['logout'])) {
     </div>
 
     <script>
-        // Sample Data - Replace with API calls
-        let members = [
-            { id: 1, name: 'Sarah Johnson', email: 'sarah@email.com', favorite: 'Nick Carter', joinDate: '2023-05-15', status: 'active', type: 'fan', notes: 'Loves I Want It That Way' },
-            { id: 2, name: 'Mike Chen', email: 'mike@email.com', favorite: 'AJ McLean', joinDate: '2023-08-22', status: 'premium', type: 'superfan', notes: 'Attended 3 concerts' },
-            { id: 3, name: 'Emma Wilson', email: 'emma@email.com', favorite: 'Brian Littrell', joinDate: '2024-01-10', status: 'active', type: 'fan', notes: '' },
-            { id: 4, name: 'David Brown', email: 'david@email.com', favorite: 'Kevin Richardson', joinDate: '2022-11-05', status: 'inactive', type: 'fan', notes: 'Inactive since 2024' },
-            { id: 5, name: 'Lisa Garcia', email: 'lisa@email.com', favorite: 'Howie Dorough', joinDate: '2024-02-20', status: 'active', type: 'vip', notes: 'VIP member' }
-        ];
-
-        let topHits = {
-            1: [
-                { rank: 1, title: 'I Want It That Way', album: 'Millennium' },
-                { rank: 2, title: 'Everybody (Backstreet\'s Back)', album: 'Backstreet\'s Back' },
-                { rank: 3, title: 'As Long As You Love Me', album: 'Backstreet\'s Back' }
-            ],
-            2: [
-                { rank: 1, title: 'Larger Than Life', album: 'Millennium' },
-                { rank: 2, title: 'Show Me the Meaning', album: 'Millennium' }
-            ]
-        };
-
-        let historyData = {
-            1: [
-                { year: 2024, title: 'Joined Fan Club', description: 'Became an official Backstreet Boys fan club member' },
-                { year: 2023, title: 'First Concert', description: 'Attended first BSB concert in Orlando' }
-            ]
-        };
+        // API URLs
+        const MEMBERS_API = 'api/members.php';
+        const ALBUMS_API = 'api/albums.php';
+        
+        // Data storage
+        let members = [];
+        let albums = [];
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             loadMembers();
-            populateMemberSelects();
+            loadAlbums();
         });
 
-        // Load Members Table
-        function loadMembers() {
+        // Load Members from API with search support
+        function loadMembers(search = '') {
+            const tbody = document.getElementById('membersTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
+
+            let url = MEMBERS_API;
+            if (search) {
+                url += '?search=' + encodeURIComponent(search);
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    members = data;
+                    renderMembersTable();
+                })
+                .catch(error => {
+                    console.error('Error loading members:', error);
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#ef4444;">Error loading members</td></tr>';
+                });
+        }
+
+        // Render Members Table
+        function renderMembersTable() {
             const tbody = document.getElementById('membersTableBody');
             tbody.innerHTML = '';
 
+            if (members.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No members found</td></tr>';
+                updateStats();
+                return;
+            }
+
             members.forEach(member => {
                 const tr = document.createElement('tr');
+                const initials = member.name ? member.name.split(' ').map(n => n[0]).join('') : 'M';
+                const birthdate = member.birthdate ? new Date(member.birthdate).toLocaleDateString() : 'N/A';
+                
                 tr.innerHTML = `
                     <td>
                         <div class="member-info">
-                            <div class="member-avatar">${member.name.split(' ').map(n => n[0]).join('')}</div>
+                            <div class="member-avatar">${initials}</div>
                             <div>
-                                <div class="member-name">${member.name}</div>
+                                <div class="member-name">${member.name || 'Unknown'}</div>
+                                <small style="color:#9ca3af;">${member.stage_name || member.position || ''}</small>
                             </div>
                         </div>
                     </td>
-                    <td class="member-email">${member.email}</td>
-                    <td>${member.favorite}</td>
-                    <td>${member.joinDate}</td>
-                    <td><span class="status-badge status-${member.status}">${member.status}</span></td>
+                    <td>${birthdate}</td>
+                    <td>${member.nationality || 'N/A'}</td>
+                    <td>${member.position || 'Vocalist'}</td>
+                    <td>
+                        <span class="status-badge status-active">Active</span>
+                    </td>
                     <td>
                         <div class="action-buttons">
-                            <button class="action-btn edit" onclick="editMember(${member.id})" title="Edit Info">
+                            <button class="action-btn edit" onclick="editMember(${member.member_id})" title="Edit Info">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="action-btn hits" onclick="openTopHitsModal(${member.id})" title="Manage Top Hits">
-                                <i class="fas fa-music"></i>
-                            </button>
-                            <button class="action-btn history" onclick="openHistoryModal(${member.id})" title="View History">
-                                <i class="fas fa-history"></i>
-                            </button>
-                            <button class="action-btn delete" onclick="deleteMember(${member.id})" title="Delete">
+                            <button class="action-btn delete" onclick="deleteMember(${member.member_id})" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -1575,38 +1636,77 @@ if (isset($_GET['logout'])) {
             updateStats();
         }
 
+        // Load Albums from API with search support
+        function loadAlbums(search = '') {
+            const grid = document.getElementById('albumsGrid');
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;">Loading...</div>';
+
+            let url = ALBUMS_API;
+            if (search) {
+                url += '?search=' + encodeURIComponent(search);
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    albums = data;
+                    renderAlbumsGrid();
+                })
+                .catch(error => {
+                    console.error('Error loading albums:', error);
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#ef4444;padding:40px;">Error loading albums</div>';
+                });
+        }
+
+        // Render Albums Grid
+        function renderAlbumsGrid() {
+            const grid = document.getElementById('albumsGrid');
+            grid.innerHTML = '';
+
+            if (albums.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;">No albums found</div>';
+                updateStats();
+                return;
+            }
+
+            albums.forEach(album => {
+                const div = document.createElement('div');
+                div.className = 'album-card';
+                const releaseDate = album.release ? new Date(album.release).getFullYear() : 'Unknown';
+                const coverImage = album.cover_img && album.cover_img !== '' 
+                    ? album.cover_img 
+                    : 'https://via.placeholder.com/300x300/2a3f5a/d4a853?text=' + encodeURIComponent(album.title || 'Album');
+                
+                div.innerHTML = `
+                    <div class="album-cover">
+                        <img src="${coverImage}" alt="${album.title || 'Album'}" onerror="this.src='https://via.placeholder.com/300x300/2a3f5a/d4a853?text=No+Image'">
+                    </div>
+                    <div class="album-info">
+                        <h3 class="album-title">${album.title || 'Untitled'}</h3>
+                        <p class="album-year">${releaseDate}</p>
+                        <p class="album-description">${album.description ? album.description.substring(0, 80) + '...' : 'No description'}</p>
+                        <div class="album-actions">
+                            <button class="action-btn-small edit" onclick="editAlbum(${album.album_id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn-small delete" onclick="deleteAlbum(${album.album_id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+
+            updateStats();
+        }
+
         // Update Stats
         function updateStats() {
             document.getElementById('totalMembers').textContent = members.length;
-            document.getElementById('activeMembers').textContent = members.filter(m => m.status === 'active').length;
-            document.getElementById('premiumMembers').textContent = members.filter(m => m.status === 'premium').length;
-        }
-
-        // Populate Member Selects
-        function populateMemberSelects() {
-            const selects = ['hitsMemberSelect', 'historyMemberSelect'];
-            selects.forEach(selectId => {
-                const select = document.getElementById(selectId);
-                select.innerHTML = '<option value="">Select Member...</option>';
-                members.forEach(member => {
-                    select.innerHTML += `<option value="${member.id}">${member.name}</option>`;
-                });
-            });
-        }
-
-        // Filter Members
-        function filterMembers() {
-            const search = document.getElementById('memberSearch').value.toLowerCase();
-            const status = document.getElementById('statusFilter').value;
-            const rows = document.querySelectorAll('#membersTableBody tr');
-
-            rows.forEach(row => {
-                const name = row.querySelector('.member-name').textContent.toLowerCase();
-                const memberStatus = row.querySelector('.status-badge').textContent.toLowerCase();
-                const matchesSearch = name.includes(search);
-                const matchesStatus = !status || memberStatus === status;
-                row.style.display = matchesSearch && matchesStatus ? '' : 'none';
-            });
+            document.getElementById('activeMembers').textContent = members.length;
+            document.getElementById('premiumMembers').textContent = albums.length;
+            document.getElementById('totalHits').textContent = albums.reduce((sum, a) => sum + 1, 0);
         }
 
         // Member Modal Functions
@@ -1615,23 +1715,26 @@ if (isset($_GET['logout'])) {
             const title = document.getElementById('modalTitle');
             
             if (memberId) {
-                const member = members.find(m => m.id === memberId);
-                document.getElementById('memberId').value = member.id;
-                document.getElementById('memberName').value = member.name;
-                document.getElementById('memberEmail').value = member.email;
-                document.getElementById('memberFavorite').value = member.favorite;
-                document.getElementById('memberStatus').value = member.status;
-                document.getElementById('memberJoinDate').value = member.joinDate;
-                document.getElementById('memberType').value = member.type;
-                document.getElementById('memberNotes').value = member.notes || '';
-                title.textContent = 'Edit Member';
+                fetch(MEMBERS_API + '?id=' + memberId)
+                    .then(response => response.json())
+                    .then(member => {
+                        document.getElementById('memberId').value = member.member_id;
+                        document.getElementById('memberName').value = member.name || '';
+                        document.getElementById('memberStageName').value = member.stage_name || '';
+                        document.getElementById('memberBirthdate').value = member.birthdate || '';
+                        document.getElementById('memberNationality').value = member.nationality || '';
+                        document.getElementById('memberPosition').value = member.position || 'Vocalist';
+                        document.getElementById('memberBio').value = member.bio || '';
+                        title.textContent = 'Edit Member';
+                        modal.classList.add('active');
+                    })
+                    .catch(error => console.error('Error loading member:', error));
             } else {
                 document.getElementById('memberForm').reset();
                 document.getElementById('memberId').value = '';
                 title.textContent = 'Add New Member';
+                modal.classList.add('active');
             }
-            
-            modal.classList.add('active');
         }
 
         function closeMemberModal() {
@@ -1645,61 +1748,149 @@ if (isset($_GET['logout'])) {
         function saveMember(event) {
             event.preventDefault();
             const id = document.getElementById('memberId').value;
-            const memberData = {
-                name: document.getElementById('memberName').value,
-                email: document.getElementById('memberEmail').value,
-                favorite: document.getElementById('memberFavorite').value,
-                status: document.getElementById('memberStatus').value,
-                joinDate: document.getElementById('memberJoinDate').value,
-                type: document.getElementById('memberType').value,
-                notes: document.getElementById('memberNotes').value
-            };
-
-            // TODO: Replace with API call
-            // Example: fetch('/api/members', { method: 'POST', body: JSON.stringify(memberData) })
             
-            if (id) {
-                const index = members.findIndex(m => m.id == id);
-                members[index] = { ...members[index], ...memberData };
-                console.log('UPDATE member:', members[index]);
-            } else {
-                const newId = Math.max(...members.map(m => m.id)) + 1;
-                members.push({ id: newId, ...memberData });
-                console.log('CREATE member:', members[members.length - 1]);
+            const formData = new FormData();
+            formData.append('action', id ? 'update' : 'create');
+            if (id) formData.append('member_id', id);
+            formData.append('about_id', '1'); // Default about section
+            formData.append('name', document.getElementById('memberName').value);
+            formData.append('stage_name', document.getElementById('memberStageName').value);
+            formData.append('birthdate', document.getElementById('memberBirthdate').value);
+            formData.append('nationality', document.getElementById('memberNationality').value);
+            formData.append('position', document.getElementById('memberPosition').value);
+            formData.append('bio', document.getElementById('memberBio').value);
+            
+            // Add profile image if selected
+            const profileImgInput = document.getElementById('memberProfileImg');
+            if (profileImgInput.files[0]) {
+                formData.append('profile_img', profileImgInput.files[0]);
             }
 
-            loadMembers();
-            populateMemberSelects();
-            closeMemberModal();
+            fetch(MEMBERS_API, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadMembers();
+                closeMemberModal();
+            })
+            .catch(error => {
+                console.error('Error saving member:', error);
+                alert('Error saving member');
+            });
         }
 
         function deleteMember(id) {
-            const member = members.find(m => m.id === id);
-            document.getElementById('deleteItemName').textContent = member.name;
-            document.getElementById('deleteItemId').value = id;
-            document.getElementById('deleteItemType').value = 'member';
-            document.getElementById('deleteModal').classList.add('active');
+            if (confirm('Are you sure you want to delete this member?')) {
+                fetch(MEMBERS_API + '?id=' + id, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    loadMembers();
+                })
+                .catch(error => {
+                    console.error('Error deleting member:', error);
+                    alert('Error deleting member');
+                });
+            }
         }
 
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.remove('active');
-        }
-
-        function confirmDelete() {
-            const id = parseInt(document.getElementById('deleteItemId').value);
-            const type = document.getElementById('deleteItemType').value;
-
-            // TODO: Replace with API call
-            // Example: fetch(`/api/${type}/${id}`, { method: 'DELETE' })
+        // Album Modal Functions
+        function openAlbumModal(albumId = null) {
+            const modal = document.getElementById('albumModal');
+            const title = document.getElementById('albumModalTitle');
             
-            if (type === 'member') {
-                members = members.filter(m => m.id !== id);
-                console.log('DELETE member:', id);
-                loadMembers();
-                populateMemberSelects();
+            if (albumId) {
+                fetch(ALBUMS_API + '?id=' + albumId)
+                    .then(response => response.json())
+                    .then(album => {
+                        document.getElementById('albumId').value = album.album_id;
+                        document.getElementById('albumTitle').value = album.title || '';
+                        document.getElementById('albumRelease').value = album.release || '';
+                        document.getElementById('albumDescription').value = album.description || '';
+                        title.textContent = 'Edit Album';
+                        modal.classList.add('active');
+                    })
+                    .catch(error => console.error('Error loading album:', error));
+            } else {
+                document.getElementById('albumForm').reset();
+                document.getElementById('albumId').value = '';
+                title.textContent = 'Add New Album';
+                modal.classList.add('active');
+            }
+        }
+
+        function closeAlbumModal() {
+            document.getElementById('albumModal').classList.remove('active');
+        }
+
+        function editAlbum(id) {
+            openAlbumModal(id);
+        }
+
+        function saveAlbum(event) {
+            event.preventDefault();
+            const id = document.getElementById('albumId').value;
+            
+            const formData = new FormData();
+            formData.append('action', id ? 'update' : 'create');
+            if (id) formData.append('album_id', id);
+            formData.append('title', document.getElementById('albumTitle').value);
+            formData.append('release', document.getElementById('albumRelease').value);
+            formData.append('description', document.getElementById('albumDescription').value);
+            
+            // Add cover image if selected
+            const coverImgInput = document.getElementById('albumCoverImg');
+            if (coverImgInput.files[0]) {
+                formData.append('cover_img', coverImgInput.files[0]);
             }
 
-            closeDeleteModal();
+            fetch(ALBUMS_API, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadAlbums();
+                closeAlbumModal();
+            })
+            .catch(error => {
+                console.error('Error saving album:', error);
+                alert('Error saving album');
+            });
+        }
+
+        function deleteAlbum(id) {
+            if (confirm('Are you sure you want to delete this album?')) {
+                fetch(ALBUMS_API + '?id=' + id, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    loadAlbums();
+                })
+                .catch(error => {
+                    console.error('Error deleting album:', error);
+                    alert('Error deleting album');
+                });
+            }
+        }
+
+        // Search functionality
+        function searchMembers() {
+            const search = document.getElementById('memberSearch').value;
+            loadMembers(search);
+        }
+
+        function searchAlbums() {
+            const search = document.getElementById('albumSearch').value;
+            loadAlbums(search);
         }
 
         // Top Hits Modal Functions
