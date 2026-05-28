@@ -1,6 +1,7 @@
 <?php
 /**
- * Album Model - Handles database operations for albums (Movies equivalent)
+ * Album Model - Handles database operations for albums
+ * Matches the new database schema with: album_id, title, release, cover_img, description
  */
 
 class Album {
@@ -12,20 +13,17 @@ class Album {
     }
 
     /**
-     * Get all albums with tracks
+     * Get all albums
      */
     public function getAll() {
-        $query = "SELECT a.*, 
-                  (SELECT COUNT(*) FROM album_tracks WHERE album_id = a.album_id) as track_count
-                  FROM " . $this->table . " a 
-                  ORDER BY release_year DESC, title ASC";
+        $query = "SELECT * FROM " . $this->table . " ORDER BY release DESC, title ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
     }
 
     /**
-     * Get single album by ID with tracks
+     * Get single album by ID
      */
     public function getById($id) {
         $query = "SELECT * FROM " . $this->table . " WHERE album_id = ?";
@@ -35,33 +33,20 @@ class Album {
     }
 
     /**
-     * Get album tracks
-     */
-    public function getTracks($albumId) {
-        $query = "SELECT * FROM album_tracks WHERE album_id = ? ORDER BY track_number ASC";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute([$albumId]);
-        return $stmt;
-    }
-
-    /**
      * Create new album
      */
     public function create($data) {
         $query = "INSERT INTO " . $this->table . " 
-                  (title, release_date, release_year, cover_image_filename, description, is_featured, is_highlight) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?)";
+                  (title, release, cover_img, description) 
+                  VALUES (?, ?, ?, ?)";
         
         $stmt = $this->conn->prepare($query);
         
         return $stmt->execute([
             $data['title'],
-            $data['release_date'] ?? null,
-            $data['release_year'],
-            $data['cover_image_filename'] ?? null,
-            $data['description'] ?? null,
-            $data['is_featured'] ?? false,
-            $data['is_highlight'] ?? false
+            $data['release'] ?? null,
+            $data['cover_img'] ?? null,
+            $data['description'] ?? null
         ]);
     }
 
@@ -70,20 +55,16 @@ class Album {
      */
     public function update($id, $data) {
         $query = "UPDATE " . $this->table . " 
-                  SET title = ?, release_date = ?, release_year = ?, cover_image_filename = ?, 
-                      description = ?, is_featured = ?, is_highlight = ?
+                  SET title = ?, release = ?, cover_img = ?, description = ?
                   WHERE album_id = ?";
         
         $stmt = $this->conn->prepare($query);
         
         return $stmt->execute([
             $data['title'],
-            $data['release_date'] ?? null,
-            $data['release_year'],
-            $data['cover_image_filename'] ?? null,
+            $data['release'] ?? null,
+            $data['cover_img'] ?? null,
             $data['description'] ?? null,
-            $data['is_featured'] ?? false,
-            $data['is_highlight'] ?? false,
             $id
         ]);
     }
@@ -95,52 +76,6 @@ class Album {
         $query = "DELETE FROM " . $this->table . " WHERE album_id = ?";
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([$id]);
-    }
-
-    /**
-     * Add track to album
-     */
-    public function addTrack($albumId, $trackData) {
-        $query = "INSERT INTO album_tracks (album_id, track_number, title, is_single, youtube_url) 
-                  VALUES (?, ?, ?, ?, ?)";
-        
-        $stmt = $this->conn->prepare($query);
-        
-        return $stmt->execute([
-            $albumId,
-            $trackData['track_number'],
-            $trackData['title'],
-            $trackData['is_single'] ?? false,
-            $trackData['youtube_url'] ?? null
-        ]);
-    }
-
-    /**
-     * Update track
-     */
-    public function updateTrack($trackId, $trackData) {
-        $query = "UPDATE album_tracks 
-                  SET track_number = ?, title = ?, is_single = ?, youtube_url = ?
-                  WHERE track_id = ?";
-        
-        $stmt = $this->conn->prepare($query);
-        
-        return $stmt->execute([
-            $trackData['track_number'],
-            $trackData['title'],
-            $trackData['is_single'] ?? false,
-            $trackData['youtube_url'] ?? null,
-            $trackId
-        ]);
-    }
-
-    /**
-     * Delete track
-     */
-    public function deleteTrack($trackId) {
-        $query = "DELETE FROM album_tracks WHERE track_id = ?";
-        $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$trackId]);
     }
 
     /**
