@@ -1,44 +1,25 @@
 ```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-
 # Dependencies
-node_modules/
-venv/
-.venv/
-.env
-.env.local
-*.env.*
+vendor/
 
 # Logs and temp files
 *.log
 *.tmp
-*.swp
 
-# Editors
+# Environment
+.env
+.env.local
+*.env.*
+
+# IDE files
 .vscode/
 .idea/
 
-# OS generated files
+# OS files
 .DS_Store
 Thumbs.db
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Distribution / packaging
-dist/
-build/
-*.tar.gz
-*.whl
-*.egg-info/
-
-# Python specific
-*.py[cod]
-*$py.class
-*.so
-.Python
+# PHP specific
+*.php~
+*.php.bak
 ```

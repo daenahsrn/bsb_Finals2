@@ -8,16 +8,36 @@ class Member {
     private $conn;
     private $table = "members";
 
+    // Properties matching database columns
+    public $member_id;
+    public $about_id;
+    public $name;
+    public $stage_name;
+    public $birthdate;
+    public $nationality;
+    public $position;
+    public $profile_img;
+    public $bio;
+    
     public function __construct($db) {
         $this->conn = $db;
     }
 
     /**
-     * Get all members
+     * Get all members with optional search
      */
-    public function getAll() {
-        $query = "SELECT * FROM " . $this->table . " ORDER BY name ASC";
+    public function getAll($search = '') {
+        $query = "SELECT * FROM " . $this->table;
+        if (!empty($search)) {
+            $query .= " WHERE name LIKE :search OR stage_name LIKE :search OR nationality LIKE :search";
+        }
+        $query .= " ORDER BY name ASC";
+        
         $stmt = $this->conn->prepare($query);
+        if (!empty($search)) {
+            $searchParam = "%{$search}%";
+            $stmt->bindParam(':search', $searchParam);
+        }
         $stmt->execute();
         return $stmt;
     }
@@ -25,66 +45,81 @@ class Member {
     /**
      * Get single member by ID
      */
-    public function getById($id) {
-        $query = "SELECT * FROM " . $this->table . " WHERE member_id = ?";
+    public function getSingle() {
+        $query = "SELECT * FROM " . $this->table . " WHERE member_id = ? LIMIT 1";
         $stmt = $this->conn->prepare($query);
-        $stmt->execute([$id]);
-        return $stmt->fetch();
+        $stmt->execute([$this->member_id]);
+        return $stmt;
     }
 
     /**
      * Create new member
      */
-    public function create($data) {
+    public function create() {
         $query = "INSERT INTO " . $this->table . " 
                   (about_id, name, stage_name, birthdate, nationality, position, profile_img, bio) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                  VALUES (:about_id, :name, :stage_name, :birthdate, :nationality, :position, :profile_img, :bio)";
         
         $stmt = $this->conn->prepare($query);
         
+        $this->name = htmlspecialchars(strip_tags($this->name));
+        if($this->stage_name) $this->stage_name = htmlspecialchars(strip_tags($this->stage_name));
+        if($this->nationality) $this->nationality = htmlspecialchars(strip_tags($this->nationality));
+        if($this->position) $this->position = htmlspecialchars(strip_tags($this->position));
+        if($this->profile_img) $this->profile_img = htmlspecialchars(strip_tags($this->profile_img));
+        if($this->bio) $this->bio = htmlspecialchars(strip_tags($this->bio));
+        
         return $stmt->execute([
-            $data['about_id'] ?? null,
-            $data['name'],
-            $data['stage_name'] ?? null,
-            $data['birthdate'] ?? null,
-            $data['nationality'] ?? null,
-            $data['position'] ?? 'Vocalist',
-            $data['profile_img'] ?? null,
-            $data['bio'] ?? null
+            ':about_id' => $this->about_id,
+            ':name' => $this->name,
+            ':stage_name' => $this->stage_name,
+            ':birthdate' => $this->birthdate,
+            ':nationality' => $this->nationality,
+            ':position' => $this->position,
+            ':profile_img' => $this->profile_img,
+            ':bio' => $this->bio
         ]);
     }
 
     /**
      * Update member
      */
-    public function update($id, $data) {
+    public function update() {
         $query = "UPDATE " . $this->table . " 
-                  SET about_id = ?, name = ?, stage_name = ?, birthdate = ?, nationality = ?, 
-                      position = ?, profile_img = ?, bio = ?
-                  WHERE member_id = ?";
+                  SET about_id = :about_id, name = :name, stage_name = :stage_name, birthdate = :birthdate, 
+                      nationality = :nationality, position = :position, profile_img = :profile_img, bio = :bio
+                  WHERE member_id = :member_id";
         
         $stmt = $this->conn->prepare($query);
         
+        $this->name = htmlspecialchars(strip_tags($this->name));
+        if($this->stage_name) $this->stage_name = htmlspecialchars(strip_tags($this->stage_name));
+        if($this->nationality) $this->nationality = htmlspecialchars(strip_tags($this->nationality));
+        if($this->position) $this->position = htmlspecialchars(strip_tags($this->position));
+        if($this->profile_img) $this->profile_img = htmlspecialchars(strip_tags($this->profile_img));
+        if($this->bio) $this->bio = htmlspecialchars(strip_tags($this->bio));
+        
         return $stmt->execute([
-            $data['about_id'] ?? null,
-            $data['name'],
-            $data['stage_name'] ?? null,
-            $data['birthdate'] ?? null,
-            $data['nationality'] ?? null,
-            $data['position'] ?? 'Vocalist',
-            $data['profile_img'] ?? null,
-            $data['bio'] ?? null,
-            $id
+            ':member_id' => $this->member_id,
+            ':about_id' => $this->about_id,
+            ':name' => $this->name,
+            ':stage_name' => $this->stage_name,
+            ':birthdate' => $this->birthdate,
+            ':nationality' => $this->nationality,
+            ':position' => $this->position,
+            ':profile_img' => $this->profile_img,
+            ':bio' => $this->bio
         ]);
     }
 
     /**
      * Delete member
      */
-    public function delete($id) {
-        $query = "DELETE FROM " . $this->table . " WHERE member_id = ?";
+    public function delete() {
+        $query = "DELETE FROM " . $this->table . " WHERE member_id = :member_id";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$id]);
+        $this->member_id = htmlspecialchars(strip_tags($this->member_id));
+        return $stmt->execute([':member_id' => $this->member_id]);
     }
 
     /**

@@ -8,16 +8,32 @@ class Album {
     private $conn;
     private $table = "albums";
 
+    // Properties matching database columns
+    public $album_id;
+    public $title;
+    public $release;
+    public $cover_img;
+    public $description;
+    
     public function __construct($db) {
         $this->conn = $db;
     }
 
     /**
-     * Get all albums
+     * Get all albums with optional search
      */
-    public function getAll() {
-        $query = "SELECT * FROM " . $this->table . " ORDER BY release DESC, title ASC";
+    public function getAll($search = '') {
+        $query = "SELECT * FROM " . $this->table;
+        if (!empty($search)) {
+            $query .= " WHERE title LIKE :search OR description LIKE :search";
+        }
+        $query .= " ORDER BY release DESC, title ASC";
+        
         $stmt = $this->conn->prepare($query);
+        if (!empty($search)) {
+            $searchParam = "%{$search}%";
+            $stmt->bindParam(':search', $searchParam);
+        }
         $stmt->execute();
         return $stmt;
     }
@@ -25,57 +41,66 @@ class Album {
     /**
      * Get single album by ID
      */
-    public function getById($id) {
-        $query = "SELECT * FROM " . $this->table . " WHERE album_id = ?";
+    public function getSingle() {
+        $query = "SELECT * FROM " . $this->table . " WHERE album_id = ? LIMIT 1";
         $stmt = $this->conn->prepare($query);
-        $stmt->execute([$id]);
-        return $stmt->fetch();
+        $stmt->execute([$this->album_id]);
+        return $stmt;
     }
 
     /**
      * Create new album
      */
-    public function create($data) {
+    public function create() {
         $query = "INSERT INTO " . $this->table . " 
                   (title, release, cover_img, description) 
-                  VALUES (?, ?, ?, ?)";
+                  VALUES (:title, :release, :cover_img, :description)";
         
         $stmt = $this->conn->prepare($query);
         
+        $this->title = htmlspecialchars(strip_tags($this->title));
+        if($this->cover_img) $this->cover_img = htmlspecialchars(strip_tags($this->cover_img));
+        if($this->description) $this->description = htmlspecialchars(strip_tags($this->description));
+        
         return $stmt->execute([
-            $data['title'],
-            $data['release'] ?? null,
-            $data['cover_img'] ?? null,
-            $data['description'] ?? null
+            ':title' => $this->title,
+            ':release' => $this->release,
+            ':cover_img' => $this->cover_img,
+            ':description' => $this->description
         ]);
     }
 
     /**
      * Update album
      */
-    public function update($id, $data) {
+    public function update() {
         $query = "UPDATE " . $this->table . " 
-                  SET title = ?, release = ?, cover_img = ?, description = ?
-                  WHERE album_id = ?";
+                  SET title = :title, release = :release, cover_img = :cover_img, description = :description
+                  WHERE album_id = :album_id";
         
         $stmt = $this->conn->prepare($query);
         
+        $this->title = htmlspecialchars(strip_tags($this->title));
+        if($this->cover_img) $this->cover_img = htmlspecialchars(strip_tags($this->cover_img));
+        if($this->description) $this->description = htmlspecialchars(strip_tags($this->description));
+        
         return $stmt->execute([
-            $data['title'],
-            $data['release'] ?? null,
-            $data['cover_img'] ?? null,
-            $data['description'] ?? null,
-            $id
+            ':album_id' => $this->album_id,
+            ':title' => $this->title,
+            ':release' => $this->release,
+            ':cover_img' => $this->cover_img,
+            ':description' => $this->description
         ]);
     }
 
     /**
      * Delete album
      */
-    public function delete($id) {
-        $query = "DELETE FROM " . $this->table . " WHERE album_id = ?";
+    public function delete() {
+        $query = "DELETE FROM " . $this->table . " WHERE album_id = :album_id";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$id]);
+        $this->album_id = htmlspecialchars(strip_tags($this->album_id));
+        return $stmt->execute([':album_id' => $this->album_id]);
     }
 
     /**
