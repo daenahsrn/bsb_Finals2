@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Backstreet Boys Fan Club</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e4e4e4;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Subtle Background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 30% 20%, rgba(76, 29, 149, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: rgba(30, 30, 50, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(20px);
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .welcome-text {
+            font-family: 'Inter', sans-serif;
+            color: #9ca3af;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        /* Main Container */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 24px;
+            padding: 24px 40px;
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(30, 30, 50, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+            height: fit-content;
+            position: relative;
+        }
+
+        .profile-section {
+            text-align: center;
+            margin-bottom: 28px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(167, 139, 250, 0.3);
+        }
+
+        .profile-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .profile-member {
+            font-family: 'Inter', sans-serif;
+            color: #9ca3af;
+            font-size: 0.85rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            color: #d1d5db;
+            text-decoration: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(139, 92, 246, 0.1);
+            color: #a78bfa;
+        }
+
+        .nav-link i {
+            color: #9ca3af;
+            font-size: 1.1rem;
+            width: 20px;
+        }
+
+        .nav-link:hover i,
+        .nav-link.active i {
+            color: #a78bfa;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .content-card {
+            background: rgba(30, 30, 50, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 28px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: #a78bfa;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            background: rgba(139, 92, 246, 0.12);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            color: #a78bfa;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            font-family: 'Inter', sans-serif;
+            color: #9ca3af;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Activity Table */
+        .activity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .activity-table th,
+        .activity-table td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .activity-table th {
+            font-family: 'Inter', sans-serif;
+            color: #9ca3af;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .activity-table td {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            color: #d1d5db;
+        }
+
+        .activity-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+        }
+
+        .action-btn.delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .action-btn.delete:hover {
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Members CRUD Styles */
+        .members-toolbar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #a78bfa;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .search-box input::placeholder {
+            color: #6b7280;
+        }
+
+        .filter-box select {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-box select:focus {
+            outline: none;
+            border-color: #a78bfa;
+        }
+
+        .filter-box option {
+            background: #1e1e32;
+            color: #ffffff;
+        }
+
+        .member-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .member-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .member-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .member-type {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .favorite-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            color: #a78bfa;
+        }
+
+        .top-hits-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .hit-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            color: #d1d5db;
+        }
+
+        .hit-item i {
+            color: #a78bfa;
+            font-size: 0.7rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-buttons .action-btn {
+            padding: 6px 10px;
+            font-size: 0.7rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #d1d5db;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .page-btn:hover {
+            background: rgba(167, 139, 250, 0.1);
+            border-color: #a78bfa;
+            color: #a78bfa;
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+            border-color: transparent;
+            color: #fff;
+        }
+
+        .status-inactive {
+            background: rgba(107, 114, 128, 0.15);
+            color: #6b7280;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e1e32 0%, #16213e 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-content.modal-large {
+            max-width: 800px;
+        }
+
+        .modal-content.modal-small {
+            max-width: 400px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-header h3 i {
+            color: #a78bfa;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-group label i {
+            color: #a78bfa;
+            font-size: 0.8rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #a78bfa;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #6b7280;
+        }
+
+        .form-group select option {
+            background: #1e1e32;
+            color: #ffffff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-cancel {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #d1d5db;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .btn-save,
+        .btn-delete {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save:hover,
+        .btn-delete:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .btn-delete:hover {
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Top Hits Modal Styles */
+        .top-hits-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .current-member {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .member-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .member-name-display {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .hits-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .hit-item-row {
+            display: grid;
+            grid-template-columns: 50px 1fr 140px 120px;
+            gap: 12px;
+            align-items: center;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .hit-item-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(167, 139, 250, 0.2);
+        }
+
+        .hit-rank {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rank-badge {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+            border-radius: 50%;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .hit-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .hit-details input {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .hit-details input:focus {
+            outline: none;
+            border-color: #a78bfa;
+        }
+
+        .hit-date input {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .hit-actions {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            background: rgba(167, 139, 250, 0.1);
+            border-color: #a78bfa;
+            color: #a78bfa;
+        }
+
+        .icon-btn.delete:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        /* History Timeline Styles */
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .history-stat {
+            text-align: center;
+            padding: 12px 20px;
+            background: rgba(167, 139, 250, 0.08);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            display: block;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #a78bfa;
+            margin-bottom: 4px;
+        }
+
+        .stat-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -26px;
+            top: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 3px solid #1e1e32;
+        }
+
+        .timeline-marker.success {
+            background: #22c55e;
+        }
+
+        .timeline-marker.info {
+            background: #60a5fa;
+        }
+
+        .timeline-marker.warning {
+            background: #f59e0b;
+        }
+
+        .timeline-marker.primary {
+            background: #a78bfa;
+        }
+
+        .timeline-content {
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .timeline-content:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(167, 139, 250, 0.2);
+        }
+
+        .timeline-date {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-bottom: 6px;
+        }
+
+        .timeline-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timeline-title i {
+            color: #a78bfa;
+        }
+
+        .timeline-description {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            color: #d1d5db;
+            line-height: 1.5;
+        }
+
+        /* Delete Warning */
+        .delete-warning {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .delete-warning i {
+            font-size: 3rem;
+            color: #ef4444;
+            margin-bottom: 16px;
+        }
+
+        .delete-warning p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .warning-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            color: #9ca3af;
+            line-height: 1.6;
+        }
+
+        /* Scrollbar Styles */
+        .modal-body::-webkit-scrollbar,
+        .hits-list::-webkit-scrollbar,
+        .timeline::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-track,
+        .hits-list::-webkit-scrollbar-track,
+        .timeline::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 3px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb,
+        .hits-list::-webkit-scrollbar-thumb,
+        .timeline::-webkit-scrollbar-thumb {
+            background: rgba(167, 139, 250, 0.3);
+            border-radius: 3px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover,
+        .hits-list::-webkit-scrollbar-thumb:hover,
+        .timeline::-webkit-scrollbar-thumb:hover {
+            background: rgba(167, 139, 250, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                gap: 16px;
+                padding: 16px 20px;
+            }
+
+            .dashboard-container {
+                padding: 16px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .activity-table {
+                font-size: 0.85rem;
+            }
+
+            .activity-table th,
+            .activity-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+        <h1 class="logo"><span>Backstreet Boys</span></h1>
+        <div class="user-info">
+            <span class="welcome-text">Welcome back!</span>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="profile-section">
+                <div class="profile-avatar">BS</div>
+                <h2 class="profile-name">Backstreet Fan</h2>
+                <p class="profile-member">Favorite: Nick Carter</p>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-user"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-music"></i>
+                        <span>Favorites</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-calendar"></i>
+                        <span>Events</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Stats Overview -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-chart-line"></i>
+                        Account Overview
+                    </h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-value">47</div>
+                        <div class="stat-label">Favorite Songs</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Concert Tickets</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stat-value">128</div>
+                        <div class="stat-label">Forum Posts</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-value">2,450</div>
+                        <div class="stat-label">Fan Points</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-history"></i>
+                        Recent Activity
+                    </h2>
+                    <button class="action-btn">
+                        <i class="fas fa-plus"></i> Add New
+                    </button>
+                </div>
+
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityTableBody">
+                        <tr>
+                            <td>#001</td>
+                            <td><i class="fas fa-music" style="color: #a78bfa;"></i> Song</td>
+                            <td>Added "I Want It That Way" to favorites</td>
+                            <td>2024-01-15</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#002</td>
+                            <td><i class="fas fa-ticket-alt" style="color: #f59e0b;"></i> Event</td>
+                            <td>Registered for Virtual Meet & Greet</td>
+                            <td>2024-01-14</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>
+                                <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#003</td>
+                            <td><i class="fas fa-comment" style="color: #22c55e;"></i> Forum</td>
+                            <td>Posted in "Best Album" discussion</td>
+                            <td>2024-01-13</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-bolt"></i>
+                        Quick Actions
+                    </h2>
+                </div>
+
+                <div class="stats-grid">
+                    <button class="stat-card" style="cursor: pointer;">
+                        <div class="stat-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="stat-label">Add Favorite</div>
+                    </button>
+
+                    <button class="stat-card" style="cursor: pointer;">
+                        <div class="stat-icon">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <div class="stat-label">Upload Content</div>
+                    </button>
+
+                    <button class="stat-card" style="cursor: pointer;">
+                        <div class="stat-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="stat-label">Send Message</div>
+                    </button>
+
+                    <button class="stat-card" style="cursor: pointer;">
+                        <div class="stat-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="stat-label">Downloads</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Members CRUD Management -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-users-cog"></i>
+                        Members Management
+                    </h2>
+                    <button class="action-btn" onclick="openMemberModal('create')">
+                        <i class="fas fa-plus"></i> Add Member
+                    </button>
+                </div>
+
+                <!-- Search & Filter -->
+                <div class="members-toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="memberSearch" placeholder="Search members..." onkeyup="filterMembers()">
+                    </div>
+                    <div class="filter-box">
+                        <select id="statusFilter" onchange="filterMembers()">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Members Table -->
+                <table class="activity-table members-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Member</th>
+                            <th>Email</th>
+                            <th>Favorite Member</th>
+                            <th>Top Hits</th>
+                            <th>Join Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membersTableBody">
+                        <tr data-member-id="1">
+                            <td>#M001</td>
+                            <td>
+                                <div class="member-cell">
+                                    <div class="member-avatar">JD</div>
+                                    <div class="member-info">
+                                        <span class="member-name">John Doe</span>
+                                        <span class="member-type">Premium</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>john.doe@email.com</td>
+                            <td><span class="favorite-badge"><i class="fas fa-user"></i> Nick Carter</span></td>
+                            <td>
+                                <div class="top-hits-preview">
+                                    <span class="hit-item"><i class="fas fa-music"></i> I Want It That Way</span>
+                                    <span class="hit-item"><i class="fas fa-music"></i> Everybody</span>
+                                </div>
+                            </td>
+                            <td>2023-06-15</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" onclick="openMemberModal('edit', 1)" title="Edit Info">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="openTopHitsModal(1)" title="Manage Top Hits">
+                                        <i class="fas fa-music"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="openHistoryModal(1)" title="View History">
+                                        <i class="fas fa-history"></i>
+                                    </button>
+                                    <button class="action-btn delete" onclick="deleteMember(1)" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-member-id="2">
+                            <td>#M002</td>
+                            <td>
+                                <div class="member-cell">
+                                    <div class="member-avatar" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);">SM</div>
+                                    <div class="member-info">
+                                        <span class="member-name">Sarah Miller</span>
+                                        <span class="member-type">Standard</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>sarah.m@email.com</td>
+                            <td><span class="favorite-badge"><i class="fas fa-user"></i> Brian Littrell</span></td>
+                            <td>
+                                <div class="top-hits-preview">
+                                    <span class="hit-item"><i class="fas fa-music"></i> As Long As You Love Me</span>
+                                </div>
+                            </td>
+                            <td>2023-08-22</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" onclick="openMemberModal('edit', 2)" title="Edit Info">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="openTopHitsModal(2)" title="Manage Top Hits">
+                                        <i class="fas fa-music"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="openHistoryModal(2)" title="View History">
+                                        <i class="fas fa-history"></i>
+                                    </button>
+                                    <button class="action-btn delete" onclick="deleteMember(2)" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-member-id="3">
+                            <td>#M003</td>
+                            <td>
+                                <div class="member-cell">
+                                    <div class="member-avatar" style="background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);">MJ</div>
+                                    <div class="member-info">
+                                        <span class="member-name">Mike Johnson</span>
+                                        <span class="member-type">Premium</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>mike.j@email.com</td>
+                            <td><span class="favorite-badge"><i class="fas fa-user"></i> Howie Dorough</span></td>
+                            <td>
+                                <div class="top-hits-preview">
+                                    <span class="hit-item"><i class="fas fa-music"></i> Shape of My Heart</span>
+                                    <span class="hit-item"><i class="fas fa-music"></i> The One</span>
+                                    <span class="hit-item"><i class="fas fa-music"></i> Larger Than Life</span>
+                                </div>
+                            </td>
+                            <td>2023-09-10</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" onclick="openMemberModal('edit', 3)" title="Edit Info">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="openTopHitsModal(3)" title="Manage Top Hits">
+                                        <i class="fas fa-music"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="openHistoryModal(3)" title="View History">
+                                        <i class="fas fa-history"></i>
+                                    </button>
+                                    <button class="action-btn delete" onclick="deleteMember(3)" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-member-id="4">
+                            <td>#M004</td>
+                            <td>
+                                <div class="member-cell">
+                                    <div class="member-avatar" style="background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);">EW</div>
+                                    <div class="member-info">
+                                        <span class="member-name">Emily Wilson</span>
+                                        <span class="member-type">Standard</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>emily.w@email.com</td>
+                            <td><span class="favorite-badge"><i class="fas fa-user"></i> AJ McLean</span></td>
+                            <td>
+                                <div class="top-hits-preview">
+                                    <span class="hit-item"><i class="fas fa-music"></i> Quit Playing Games</span>
+                                </div>
+                            </td>
+                            <td>2023-11-05</td>
+                            <td><span class="status-badge status-inactive">Inactive</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" onclick="openMemberModal('edit', 4)" title="Edit Info">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="openTopHitsModal(4)" title="Manage Top Hits">
+                                        <i class="fas fa-music"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="openHistoryModal(4)" title="View History">
+                                        <i class="fas fa-history"></i>
+                                    </button>
+                                    <button class="action-btn delete" onclick="deleteMember(4)" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-btn" onclick="changePage(-1)"><i class="fas fa-chevron-left"></i></button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn" onclick="changePage(1)"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit/Create Member Modal -->
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fas fa-user-edit"></i> Edit Member Info</h3>
+                <button class="modal-close" onclick="closeMemberModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="memberForm" onsubmit="saveMember(event)">
+                    <input type="hidden" id="memberId">
+                    <input type="hidden" id="memberAction">
+                    
+                    <div class="form-group">
+                        <label for="memberName"><i class="fas fa-user"></i> Full Name</label>
+                        <input type="text" id="memberName" required placeholder="Enter full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memberEmail"><i class="fas fa-envelope"></i> Email Address</label>
+                        <input type="email" id="memberEmail" required placeholder="Enter email address">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="memberType"><i class="fas fa-crown"></i> Membership Type</label>
+                            <select id="memberType" required>
+                                <option value="standard">Standard</option>
+                                <option value="premium">Premium</option>
+                                <option value="vip">VIP</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="memberStatus"><i class="fas fa-toggle-on"></i> Status</label>
+                            <select id="memberStatus" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="favoriteMember"><i class="fas fa-star"></i> Favorite Backstreet Boy</label>
+                        <select id="favoriteMember" required>
+                            <option value="">Select favorite member</option>
+                            <option value="Nick Carter">Nick Carter</option>
+                            <option value="Brian Littrell">Brian Littrell</option>
+                            <option value="Howie Dorough">Howie Dorough</option>
+                            <option value="AJ McLean">AJ McLean</option>
+                            <option value="Kevin Richardson">Kevin Richardson</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="joinDate"><i class="fas fa-calendar"></i> Join Date</label>
+                        <input type="date" id="joinDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memberNotes"><i class="fas fa-comment"></i> Notes</label>
+                        <textarea id="memberNotes" rows="3" placeholder="Additional notes about this member"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeMemberModal()">Cancel</button>
+                        <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Member</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Hits Management Modal -->
+    <div id="topHitsModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3><i class="fas fa-music"></i> Manage Top Hits</h3>
+                <button class="modal-close" onclick="closeTopHitsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hitsMemberId">
+                
+                <div class="top-hits-header">
+                    <div class="current-member">
+                        <span class="member-label">Managing hits for:</span>
+                        <span id="currentMemberName" class="member-name-display">John Doe</span>
+                    </div>
+                    <button class="action-btn" onclick="addNewHit()">
+                        <i class="fas fa-plus"></i> Add Hit
+                    </button>
+                </div>
+
+                <div class="hits-list" id="hitsList">
+                    <!-- Hit items will be dynamically populated -->
+                    <div class="hit-item-row" data-hit-id="1">
+                        <div class="hit-rank">
+                            <span class="rank-badge">1</span>
+                        </div>
+                        <div class="hit-details">
+                            <input type="text" class="hit-song-name" value="I Want It That Way" placeholder="Song name">
+                            <input type="text" class="hit-album" value="Millennium" placeholder="Album">
+                        </div>
+                        <div class="hit-date">
+                            <input type="date" value="2023-06-15">
+                        </div>
+                        <div class="hit-actions">
+                            <button class="icon-btn" onclick="moveHitUp(1)" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                            <button class="icon-btn" onclick="moveHitDown(1)" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                            <button class="icon-btn delete" onclick="removeHit(1)" title="Remove"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="hit-item-row" data-hit-id="2">
+                        <div class="hit-rank">
+                            <span class="rank-badge">2</span>
+                        </div>
+                        <div class="hit-details">
+                            <input type="text" class="hit-song-name" value="Everybody (Backstreet's Back)" placeholder="Song name">
+                            <input type="text" class="hit-album" value="Backstreet's Back" placeholder="Album">
+                        </div>
+                        <div class="hit-date">
+                            <input type="date" value="2023-07-20">
+                        </div>
+                        <div class="hit-actions">
+                            <button class="icon-btn" onclick="moveHitUp(2)" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                            <button class="icon-btn" onclick="moveHitDown(2)" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                            <button class="icon-btn delete" onclick="removeHit(2)" title="Remove"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeTopHitsModal()">Cancel</button>
+                    <button type="button" class="btn-save" onclick="saveTopHits()"><i class="fas fa-save"></i> Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3><i class="fas fa-history"></i> Member History</h3>
+                <button class="modal-close" onclick="closeHistoryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="historyMemberId">
+                
+                <div class="history-header">
+                    <div class="current-member">
+                        <span class="member-label">History for:</span>
+                        <span id="historyMemberName" class="member-name-display">John Doe</span>
+                    </div>
+                    <div class="history-stats">
+                        <div class="history-stat">
+                            <span class="stat-number" id="totalActivities">5</span>
+                            <span class="stat-text">Total Activities</span>
+                        </div>
+                        <div class="history-stat">
+                            <span class="stat-number" id="totalHits">12</span>
+                            <span class="stat-text">Songs Added</span>
+                        </div>
+                        <div class="history-stat">
+                            <span class="stat-number" id="memberSince">180</span>
+                            <span class="stat-text">Days Since Join</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline" id="historyTimeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2024-01-15 14:30</div>
+                            <div class="timeline-title"><i class="fas fa-music"></i> Added to Favorites</div>
+                            <div class="timeline-description">Added "I Want It That Way" to top hits</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker info"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2024-01-10 09:15</div>
+                            <div class="timeline-title"><i class="fas fa-user-edit"></i> Profile Updated</div>
+                            <div class="timeline-description">Changed favorite member to Nick Carter</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker warning"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2024-01-05 16:45</div>
+                            <div class="timeline-title"><i class="fas fa-ticket-alt"></i> Event Registration</div>
+                            <div class="timeline-description">Registered for Virtual Meet & Greet event</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2023-12-20 11:20</div>
+                            <div class="timeline-title"><i class="fas fa-star"></i> Membership Upgraded</div>
+                            <div class="timeline-description">Upgraded from Standard to Premium membership</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker primary"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">2023-06-15 08:00</div>
+                            <div class="timeline-title"><i class="fas fa-user-plus"></i> Member Joined</div>
+                            <div class="timeline-description">Account created and registered</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeHistoryModal()">Close</button>
+                    <button type="button" class="btn-save" onclick="exportHistory()"><i class="fas fa-download"></i> Export History</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="delete-warning">
+                    <i class="fas fa-trash-alt"></i>
+                    <p>Are you sure you want to delete this member?</p>
+                    <p class="warning-text">This action cannot be undone. All associated data including top hits and history will be permanently removed.</p>
+                </div>
+                <input type="hidden" id="deleteMemberId">
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                    <button type="button" class="btn-delete" onclick="confirmDelete()"><i class="fas fa-trash"></i> Delete Member</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Placeholder functions for future CRUD integration
+        function logout() {
+            console.log('Logout initiated');
+            // TODO: Integrate logout functionality
+            alert('Logout functionality will be integrated soon!');
+            window.location.href = 'login.html';
+        }
+
+        // ============================================
+        // MEMBERS CRUD OPERATIONS
+        // ============================================
+        
+        // Open Member Modal (Create/Edit)
+        function openMemberModal(action, memberId = null) {
+            const modal = document.getElementById('memberModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const memberActionInput = document.getElementById('memberAction');
+            const memberForm = document.getElementById('memberForm');
+            
+            if (action === 'create') {
+                modalTitle.innerHTML = '<i class="fas fa-user-plus"></i> Add New Member';
+                memberActionInput.value = 'create';
+                memberForm.reset();
+                document.getElementById('memberId').value = '';
+            } else {
+                modalTitle.innerHTML = '<i class="fas fa-user-edit"></i> Edit Member Info';
+                memberActionInput.value = 'edit';
+                document.getElementById('memberId').value = memberId;
+                
+                // TODO: Fetch member data from backend
+                // For now, populate with sample data
+                loadMemberData(memberId);
+            }
+            
+            modal.classList.add('show');
+        }
+        
+        // Load member data for editing
+        function loadMemberData(memberId) {
+            // TODO: Replace with actual API call to fetch member data
+            const sampleData = {
+                1: { name: 'John Doe', email: 'john.doe@email.com', type: 'premium', status: 'active', favorite: 'Nick Carter', joinDate: '2023-06-15', notes: '' },
+                2: { name: 'Sarah Miller', email: 'sarah.m@email.com', type: 'standard', status: 'active', favorite: 'Brian Littrell', joinDate: '2023-08-22', notes: '' },
+                3: { name: 'Mike Johnson', email: 'mike.j@email.com', type: 'premium', status: 'pending', favorite: 'Howie Dorough', joinDate: '2023-09-10', notes: '' },
+                4: { name: 'Emily Wilson', email: 'emily.w@email.com', type: 'standard', status: 'inactive', favorite: 'AJ McLean', joinDate: '2023-11-05', notes: '' }
+            };
+            
+            const data = sampleData[memberId];
+            if (data) {
+                document.getElementById('memberName').value = data.name;
+                document.getElementById('memberEmail').value = data.email;
+                document.getElementById('memberType').value = data.type;
+                document.getElementById('memberStatus').value = data.status;
+                document.getElementById('favoriteMember').value = data.favorite;
+                document.getElementById('joinDate').value = data.joinDate;
+                document.getElementById('memberNotes').value = data.notes;
+            }
+        }
+        
+        // Close Member Modal
+        function closeMemberModal() {
+            document.getElementById('memberModal').classList.remove('show');
+        }
+        
+        // Save Member (Create/Update)
+        function saveMember(event) {
+            event.preventDefault();
+            
+            const action = document.getElementById('memberAction').value;
+            const memberId = document.getElementById('memberId').value;
+            
+            const memberData = {
+                id: memberId || Date.now(),
+                name: document.getElementById('memberName').value,
+                email: document.getElementById('memberEmail').value,
+                type: document.getElementById('memberType').value,
+                status: document.getElementById('memberStatus').value,
+                favorite: document.getElementById('favoriteMember').value,
+                joinDate: document.getElementById('joinDate').value,
+                notes: document.getElementById('memberNotes').value
+            };
+            
+            // TODO: Send to backend API
+            console.log('Saving member:', action, memberData);
+            
+            // Simulate success
+            alert(`Member ${action === 'create' ? 'created' : 'updated'} successfully!`);
+            closeMemberModal();
+            
+            // TODO: Refresh table data from backend
+        }
+        
+        // Delete Member
+        function deleteMember(memberId) {
+            const modal = document.getElementById('deleteModal');
+            document.getElementById('deleteMemberId').value = memberId;
+            modal.classList.add('show');
+        }
+        
+        // Close Delete Modal
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+        }
+        
+        // Confirm Delete
+        function confirmDelete() {
+            const memberId = document.getElementById('deleteMemberId').value;
+            
+            // TODO: Send delete request to backend API
+            console.log('Deleting member:', memberId);
+            
+            // Simulate success
+            alert('Member deleted successfully!');
+            closeDeleteModal();
+            
+            // TODO: Remove row from table or refresh data
+        }
+        
+        // Filter Members
+        function filterMembers() {
+            const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const rows = document.querySelectorAll('#membersTableBody tr');
+            
+            rows.forEach(row => {
+                const memberName = row.querySelector('.member-name').textContent.toLowerCase();
+                const statusBadge = row.querySelector('.status-badge');
+                const status = statusBadge.classList.contains('status-active') ? 'active' :
+                              statusBadge.classList.contains('status-inactive') ? 'inactive' : 'pending';
+                
+                const matchesSearch = memberName.includes(searchTerm);
+                const matchesStatus = !statusFilter || status === statusFilter;
+                
+                row.style.display = matchesSearch && matchesStatus ? '' : 'none';
+            });
+        }
+        
+        // Pagination
+        function changePage(direction) {
+            // TODO: Implement pagination logic with backend
+            console.log('Change page:', direction);
+        }
+        
+        // ============================================
+        // TOP HITS MANAGEMENT
+        // ============================================
+        
+        // Open Top Hits Modal
+        function openTopHitsModal(memberId) {
+            const modal = document.getElementById('topHitsModal');
+            document.getElementById('hitsMemberId').value = memberId;
+            
+            // Get member name from table
+            const row = document.querySelector(`tr[data-member-id="${memberId}"]`);
+            const memberName = row.querySelector('.member-name').textContent;
+            document.getElementById('currentMemberName').textContent = memberName;
+            
+            // TODO: Fetch top hits data from backend
+            // For now, show sample data already in HTML
+            
+            modal.classList.add('show');
+        }
+        
+        // Close Top Hits Modal
+        function closeTopHitsModal() {
+            document.getElementById('topHitsModal').classList.remove('show');
+        }
+        
+        // Add New Hit
+        function addNewHit() {
+            const hitsList = document.getElementById('hitsList');
+            const hitId = Date.now();
+            const rank = hitsList.children.length + 1;
+            
+            const hitRow = document.createElement('div');
+            hitRow.className = 'hit-item-row';
+            hitRow.setAttribute('data-hit-id', hitId);
+            hitRow.innerHTML = `
+                <div class="hit-rank">
+                    <span class="rank-badge">${rank}</span>
+                </div>
+                <div class="hit-details">
+                    <input type="text" class="hit-song-name" placeholder="Song name">
+                    <input type="text" class="hit-album" placeholder="Album">
+                </div>
+                <div class="hit-date">
+                    <input type="date" value="${new Date().toISOString().split('T')[0]}">
+                </div>
+                <div class="hit-actions">
+                    <button class="icon-btn" onclick="moveHitUp(${hitId})" title="Move Up"><i class="fas fa-arrow-up"></i></button>
+                    <button class="icon-btn" onclick="moveHitDown(${hitId})" title="Move Down"><i class="fas fa-arrow-down"></i></button>
+                    <button class="icon-btn delete" onclick="removeHit(${hitId})" title="Remove"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            
+            hitsList.appendChild(hitRow);
+        }
+        
+        // Move Hit Up
+        function moveHitUp(hitId) {
+            const hitRow = document.querySelector(`.hit-item-row[data-hit-id="${hitId}"]`);
+            const prevRow = hitRow.previousElementSibling;
+            if (prevRow) {
+                hitRow.parentNode.insertBefore(hitRow, prevRow);
+                updateHitRanks();
+            }
+        }
+        
+        // Move Hit Down
+        function moveHitDown(hitId) {
+            const hitRow = document.querySelector(`.hit-item-row[data-hit-id="${hitId}"]`);
+            const nextRow = hitRow.nextElementSibling;
+            if (nextRow) {
+                hitRow.parentNode.insertBefore(nextRow, hitRow);
+                updateHitRanks();
+            }
+        }
+        
+        // Update Hit Ranks
+        function updateHitRanks() {
+            const hitsList = document.getElementById('hitsList');
+            const rows = hitsList.querySelectorAll('.hit-item-row');
+            rows.forEach((row, index) => {
+                row.querySelector('.rank-badge').textContent = index + 1;
+            });
+        }
+        
+        // Remove Hit
+        function removeHit(hitId) {
+            const hitRow = document.querySelector(`.hit-item-row[data-hit-id="${hitId}"]`);
+            if (confirm('Are you sure you want to remove this hit?')) {
+                hitRow.remove();
+                updateHitRanks();
+            }
+        }
+        
+        // Save Top Hits
+        function saveTopHits() {
+            const memberId = document.getElementById('hitsMemberId').value;
+            const hitsList = document.getElementById('hitsList');
+            const hits = [];
+            
+            hitsList.querySelectorAll('.hit-item-row').forEach((row, index) => {
+                hits.push({
+                    rank: index + 1,
+                    songName: row.querySelector('.hit-song-name').value,
+                    album: row.querySelector('.hit-album').value,
+                    date: row.querySelector('.hit-date input').value
+                });
+            });
+            
+            // TODO: Send to backend API
+            console.log('Saving top hits for member', memberId, hits);
+            
+            alert('Top hits saved successfully!');
+            closeTopHitsModal();
+        }
+        
+        // ============================================
+        // HISTORY MANAGEMENT
+        // ============================================
+        
+        // Open History Modal
+        function openHistoryModal(memberId) {
+            const modal = document.getElementById('historyModal');
+            document.getElementById('historyMemberId').value = memberId;
+            
+            // Get member name from table
+            const row = document.querySelector(`tr[data-member-id="${memberId}"]`);
+            const memberName = row.querySelector('.member-name').textContent;
+            document.getElementById('historyMemberName').textContent = memberName;
+            
+            // TODO: Fetch history data from backend
+            // For now, show sample data already in HTML
+            
+            modal.classList.add('show');
+        }
+        
+        // Close History Modal
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.remove('show');
+        }
+        
+        // Export History
+        function exportHistory() {
+            const memberId = document.getElementById('historyMemberId').value;
+            
+            // TODO: Generate and download history report
+            console.log('Exporting history for member', memberId);
+            alert('History export functionality will be integrated with backend!');
+        }
+        
+        // ============================================
+        // CRUD OPERATIONS OBJECT
+        // ============================================
+        const crudOperations = {
+            create: function(data) {
+                console.log('CREATE operation:', data);
+                // TODO: Implement create functionality with backend API
+            },
+            read: function(id) {
+                console.log('READ operation:', id);
+                // TODO: Implement read functionality with backend API
+            },
+            update: function(id, data) {
+                console.log('UPDATE operation:', id, data);
+                // TODO: Implement update functionality with backend API
+            },
+            delete: function(id) {
+                console.log('DELETE operation:', id);
+                // TODO: Implement delete functionality with backend API
+            }
+        };
+    </script>
+</body>
+</html>
