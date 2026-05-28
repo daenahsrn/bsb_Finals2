@@ -6,7 +6,7 @@
 
 class Database {
     private $host = "localhost";
-    private $db_name = "bsb_fan_website";
+    private $db_name = "backstreetboys_db";
     private $username = "root";
     private $password = "";
     private $conn;

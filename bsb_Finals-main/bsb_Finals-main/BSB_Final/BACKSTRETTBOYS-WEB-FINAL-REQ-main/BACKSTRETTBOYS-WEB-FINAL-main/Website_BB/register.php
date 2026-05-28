@@ -22,7 +22,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow: hidden;
+            overflow: auto;
             color: #e4e4e4;
             padding: 20px 0;
         }
@@ -47,6 +47,7 @@
             width: 100%;
             max-width: 480px;
             padding: 20px;
+            margin: 40px auto;
         }
 
         .register-card {
@@ -211,7 +212,7 @@
         }
 
         .back-home {
-            position: absolute;
+            position: fixed;
             top: 24px;
             left: 24px;
             color: #9ca3af;
@@ -289,7 +290,68 @@
                 <p class="subtitle">Join the fan club today!</p>
             </div>
 
-            <form id="registerForm">
+            <?php
+            session_start();
+            require_once 'config/database.php';
+            
+            $error = '';
+            $success = '';
+            
+            // Handle registration submission
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $username = trim($_POST['username'] ?? '');
+                $password = $_POST['password'] ?? '';
+                $confirmPassword = $_POST['confirmPassword'] ?? '';
+                
+                if (!empty($username) && !empty($password)) {
+                    if ($password !== $confirmPassword) {
+                        $error = "Passwords do not match!";
+                    } else {
+                        try {
+                            $database = new Database();
+                            $conn = $database->getConnection();
+                            
+                            // Check if username already exists
+                            $checkStmt = $conn->prepare("SELECT admin_id FROM admins WHERE username = :username");
+                            $checkStmt->bindParam(':username', $username, PDO::PARAM_STR);
+                            $checkStmt->execute();
+                            
+                            if ($checkStmt->rowCount() > 0) {
+                                $error = "Username already exists! Please choose another.";
+                            } else {
+                                // Hash the password for security
+                                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                                
+                                // Insert new admin
+                                $stmt = $conn->prepare("INSERT INTO admins (username, password, created) VALUES (:username, :password, NOW())");
+                                $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+                                $stmt->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
+                                
+                                if ($stmt->execute()) {
+                                    $success = "Account created successfully! You can now login.";
+                                } else {
+                                    $error = "Registration failed. Please try again.";
+                                }
+                            }
+                        } catch(PDOException $e) {
+                            $error = "Database error: " . $e->getMessage();
+                        }
+                    }
+                } else {
+                    $error = "Please fill in all required fields!";
+                }
+            }
+            
+            if ($error) {
+                echo '<div style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); border-radius: 8px; padding: 12px; margin-bottom: 20px; color: #fca5a5; font-size: 0.9rem;">' . htmlspecialchars($error) . '</div>';
+            }
+            
+            if ($success) {
+                echo '<div style="background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.5); border-radius: 8px; padding: 12px; margin-bottom: 20px; color: #86efac; font-size: 0.9rem;">' . htmlspecialchars($success) . '</div>';
+            }
+            ?>
+
+            <form id="registerForm" action="register.php" method="POST">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="firstName">First Name</label>
@@ -309,17 +371,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <div class="input-wrapper">
-                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
-                        <i class="fas fa-envelope input-icon"></i>
-                    </div>
-                </div>
-
-                <div class="form-group">
                     <label for="username">Username</label>
                     <div class="input-wrapper">
-                        <input type="text" id="username" name="username" placeholder="Choose a username" required>
+                        <input type="text" id="username" name="username" placeholder="Choose a username" required value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
                         <i class="fas fa-at input-icon"></i>
                     </div>
                 </div>
@@ -374,33 +428,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = {
-                firstName: document.getElementById('firstName').value,
-                lastName: document.getElementById('lastName').value,
-                email: document.getElementById('email').value,
-                username: document.getElementById('username').value,
-                password: document.getElementById('password').value,
-                confirmPassword: document.getElementById('confirmPassword').value,
-                favoriteMember: document.getElementById('favoriteMember').value
-            };
-            
-            // Validate passwords match
-            if (formData.password !== formData.confirmPassword) {
-                alert('Passwords do not match!');
-                return;
-            }
-            
-            // TODO: Integrate CRUD registration functionality here
-            console.log('Registration attempt:', formData);
-            
-            // Placeholder for future CRUD integration
-            alert('Registration functionality will be integrated soon!');
-        });
-    </script>
 </body>
 </html>

@@ -22,7 +22,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow: hidden;
+            overflow: auto;
             color: #e4e4e4;
         }
 
@@ -46,6 +46,7 @@
             width: 100%;
             max-width: 420px;
             padding: 20px;
+            margin: 40px auto;
         }
 
         .login-card {
@@ -195,7 +196,7 @@
         }
 
         .back-home {
-            position: absolute;
+            position: fixed;
             top: 24px;
             left: 24px;
             color: #9ca3af;
@@ -212,6 +213,17 @@
 
         .back-home:hover {
             color: #ffffff;
+        }
+
+        /* Hide create account link by default, show only when window is resized wider */
+        .create-account-link {
+            display: none;
+        }
+
+        @media (min-width: 500px) {
+            .create-account-link {
+                display: inline;
+            }
         }
 
         @media (max-width: 480px) {
@@ -243,11 +255,60 @@
                 <p class="subtitle">Welcome back! Please login to continue.</p>
             </div>
 
-            <form id="loginForm" action="dashboard.php" method="POST">
+            <?php
+            session_start();
+            require_once 'config/database.php';
+            
+            $error = '';
+            $success = '';
+            
+            // Handle login submission
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $username = trim($_POST['username'] ?? '');
+                $password = $_POST['password'] ?? '';
+                
+                if (!empty($username) && !empty($password)) {
+                    try {
+                        $database = new Database();
+                        $conn = $database->getConnection();
+                        
+                        $stmt = $conn->prepare("SELECT admin_id, username, password FROM admins WHERE username = :username");
+                        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+                        $stmt->execute();
+                        
+                        if ($stmt->rowCount() === 1) {
+                            $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+                            // Verify password (use password_verify for hashed passwords)
+                            if (password_verify($password, $admin['password']) || $password === $admin['password']) {
+                                $_SESSION['admin_id'] = $admin['admin_id'];
+                                $_SESSION['username'] = $admin['username'];
+                                $_SESSION['logged_in'] = true;
+                                header("Location: dashboard.php");
+                                exit();
+                            } else {
+                                $error = "Invalid password!";
+                            }
+                        } else {
+                            $error = "Username not found!";
+                        }
+                    } catch(PDOException $e) {
+                        $error = "Database error: " . $e->getMessage();
+                    }
+                } else {
+                    $error = "Please enter both username and password!";
+                }
+            }
+            
+            if ($error) {
+                echo '<div style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); border-radius: 8px; padding: 12px; margin-bottom: 20px; color: #fca5a5; font-size: 0.9rem;">' . htmlspecialchars($error) . '</div>';
+            }
+            ?>
+
+            <form id="loginForm" action="login.php" method="POST">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <div class="input-wrapper">
-                        <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                        <input type="text" id="username" name="username" placeholder="Enter your username" required value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
                         <i class="fas fa-user input-icon"></i>
                     </div>
                 </div>
@@ -266,26 +327,11 @@
             </form>
 
             <div class="extra-links">
-                <a href="register.php">Create Account</a>
+                <a href="register.php" class="create-account-link">Create Account</a>
                 <span class="divider">|</span>
                 <a href="#">Forgot Password?</a>
             </div>
         </div>
     </div>
-
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            // Form will submit normally to dashboard.php
-            // Dashboard.php will handle authentication
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            if(!username || !password) {
-                e.preventDefault();
-                alert('Please enter both username and password');
-                return false;
-            }
-        });
-    </script>
 </body>
 </html>
