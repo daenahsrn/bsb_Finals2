@@ -1,24 +1,32 @@
 ```
 # Dependencies
-vendor/
+node_modules/
 
 # Environment
 .env
 .env.local
 .env.*
 
-# Logs
+# Logs and temp files
 *.log
+*.tmp
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Editors
+.vscode/
+.idea/
 
-# Backup files
-*.bak
-*~
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+.env
+
+# Build artifacts
+dist/
+build/
+target/
 ```
-
-Wait, let me reconsider the file changes. Looking at the added files, they are all source code files (.php, .sql, .md) and there are no build artifacts, dependencies, or temporary files in the change list. Therefore, no .gitignore rules are needed.
-
-(empty — output nothing)
