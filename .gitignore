@@ -1,0 +1,24 @@
+```
+# Dependencies
+vendor/
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*~
+```
+
+Wait, let me reconsider the file changes. Looking at the added files, they are all source code files (.php, .sql, .md) and there are no build artifacts, dependencies, or temporary files in the change list. Therefore, no .gitignore rules are needed.
+
+(empty — output nothing)
