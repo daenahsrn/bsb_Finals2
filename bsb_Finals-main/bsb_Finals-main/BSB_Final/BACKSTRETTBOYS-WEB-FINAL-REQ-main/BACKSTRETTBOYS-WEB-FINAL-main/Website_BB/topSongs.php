@@ -1,23 +1,3 @@
-<?php
-/**
- * Top Songs Page - Database-connected version
- * Backstreet Boys Fan Website
- */
-
-include_once 'config/database.php';
-
-$database = new Database();
-$db = $database->getConnection();
-
-// Fetch all albums with track counts
-$albumsQuery = "SELECT a.*, 
-                (SELECT COUNT(*) FROM album_tracks WHERE album_id = a.album_id) as track_count
-                FROM albums a 
-                ORDER BY release_year DESC, title ASC";
-$albumsStmt = $db->prepare($albumsQuery);
-$albumsStmt->execute();
-$albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,85 +26,152 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
                     <a href="about.php" class="about_nav">About</a>
                     <a href="topSongs.php" class="topsongs_nav">Top Hits</a>
                     <a href="history.php" class="history">Band's History</a>
-                    <a href="login.php" class="login_btn">Dashboard</a>
                 </nav>
             </div>
         </header>
     </section>
 
-    <main class="topsongs_main">
-        <section class="topsongs_banner">
-            <h1>🎵 ALBUM COLLECTION 🎵</h1>
-            <p>From Millennium to DNA - A Journey Through Music</p>
-            <div class="decorative-line"></div>
+    <main class="contents_TopSongs">
+        <!-- Page Header with Retro Styling -->
+        <section class="topsongs-page-header">
+            <div class="page-title-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+            </div>
+            <h1 class="page-main-title">TOP HITS & ALBUMS</h1>
+            <p class="page-subtitle">★ Decades of Unforgettable Music ★</p>
+            <div class="page-decorative-line"></div>
         </section>
 
-        <section class="albums_container">
-            <?php if (count($albums) > 0): ?>
-                <?php foreach ($albums as $album): ?>
-                    <div class="album-card <?php echo $album['is_highlight'] ? 'highlighted' : ''; ?>">
-                        <div class="album-artwork">
-                            <img src="image/<?php echo htmlspecialchars($album['cover_image_filename'] ?? 'default.jpg'); ?>" alt="<?php echo htmlspecialchars($album['title']); ?>">
-                            <?php if ($album['is_featured']): ?>
-                                <span class="featured-badge">Featured</span>
-                            <?php endif; ?>
-                        </div>
-                        <div class="album-info">
-                            <h2><?php echo htmlspecialchars($album['title']); ?></h2>
-                            <p class="release-year"><?php echo htmlspecialchars($album['release_year']); ?></p>
-                            <p class="track-count"><?php echo $album['track_count']; ?> Tracks</p>
-                            
-                            <?php
-                            // Fetch tracks for this album
-                            $tracksQuery = "SELECT * FROM album_tracks WHERE album_id = ? ORDER BY track_number ASC";
-                            $tracksStmt = $db->prepare($tracksQuery);
-                            $tracksStmt->execute([$album['album_id']]);
-                            $tracks = $tracksStmt->fetchAll(PDO::FETCH_ASSOC);
-                            ?>
-                            
-                            <?php if (count($tracks) > 0): ?>
-                                <div class="tracklist">
-                                    <h3>Track List:</h3>
-                                    <ol>
-                                        <?php foreach ($tracks as $track): ?>
-                                            <li>
-                                                <span class="track-title"><?php echo htmlspecialchars($track['title']); ?></span>
-                                                <?php if ($track['is_single']): ?>
-                                                    <span class="single-badge">Single</span>
-                                                <?php endif; ?>
-                                            </li>
-                                        <?php endforeach; ?>
-                                    </ol>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p class="no-albums">No albums available at the moment.</p>
-            <?php endif; ?>
+        <!-- Retro Divider -->
+        <div class="retro-divider">
+            <span class="divider-star">✦</span>
+            <span class="divider-line"></span>
+            <span class="divider-text">THE DISCOGRAPHY</span>
+            <span class="divider-line"></span>
+            <span class="divider-star">✦</span>
+        </div>
+
+        <section class="container">
+            <div class="album_card">
+                <div class="card-vintage-frame"></div>
+                <div class="card-corner-tl"></div>
+                <div class="card-corner-tr"></div>
+                <div class="card-corner-bl"></div>
+                <div class="card-corner-br"></div>
+                <div class="album-year-badge">2025</div>
+                <img src="millenium 2.0.jpg" alt="Millennium 2.0 Album Cover">
+                <h3>Millennium 2.0</h3>
+                <h5 class="release_date">Released: July 11, 2025</h5>
+                <div class="tracklist">
+                    <p>Larger Than Life</p>
+                    <p>I Want It That Way</p>
+                    <p>Show Me the Meaning of Being Lonely</p>
+                    <p>It's Gotta Be You</p>
+                    <p>I Need You Tonight</p>
+                </div>
+            </div>
+
+            <div class="album_card">
+                <div class="card-vintage-frame"></div>
+                <div class="card-corner-tl"></div>
+                <div class="card-corner-tr"></div>
+                <div class="card-corner-bl"></div>
+                <div class="card-corner-br"></div>
+                <div class="album-year-badge">2022</div>
+                <img src="christmasAlbum.jpg" alt="A Very Backstreet Christmas Album Cover">
+                <h3>A Very Backstreet Christmas</h3>
+                <h5 class="release_date">Released: October 14, 2022</h5>
+                <div class="tracklist">
+                    <p>White Christmas</p>
+                    <p>The Christmas Song</p>
+                    <p>Winter Wonderland</p>
+                    <p>Have Yourself A Merry Little Christmas</p>
+                    <p>Last Christmas</p>
+                </div>
+            </div>
+
+            <div class="album_card">
+                <div class="card-vintage-frame"></div>
+                <div class="card-corner-tl"></div>
+                <div class="card-corner-tr"></div>
+                <div class="card-corner-bl"></div>
+                <div class="card-corner-br"></div>
+                <div class="album-year-badge">2019</div>
+                <img src="DNAAlbum.jpg" alt="DNA Album Cover">
+                <h3>DNA</h3>
+                <h5 class="release_date">Released: January 25, 2019</h5>
+                <div class="tracklist">
+                    <p>Don't Go Breaking My Heart</p>
+                    <p>Nobody Else</p>
+                    <p>Breathe</p>
+                    <p>New Love</p>
+                    <p>Passionate</p>
+                </div>
+            </div>
+
+            <div class="album_card">
+                <div class="card-vintage-frame"></div>
+                <div class="card-corner-tl"></div>
+                <div class="card-corner-tr"></div>
+                <div class="card-corner-bl"></div>
+                <div class="card-corner-br"></div>
+                <div class="album-year-badge">2000</div>
+                <img src="black&blue.jpg" alt="Black & Blue Album Cover">
+                <h3>Black & Blue</h3>
+                <h5 class="release_date">Released: November 21, 2000</h5>
+                <div class="tracklist">
+                    <p>The Call</p>
+                    <p>Shape of My Heart</p>
+                    <p>Get Another Boyfriend</p>
+                    <p>Shining Star</p>
+                    <p>I Promise You (With Everything I Am)</p>
+                </div>
+            </div>
+
+            <div class="album_card highlight-album">
+                <div class="card-vintage-frame"></div>
+                <div class="card-corner-tl"></div>
+                <div class="card-corner-tr"></div>
+                <div class="card-corner-bl"></div>
+                <div class="card-corner-br"></div>
+                <div class="album-year-badge special">1999</div>
+                <div class="album-icon">💿</div>
+                <img src="millenium.jpg" alt="Millennium Album Cover">
+                <h3>Millennium</h3>
+                <h5 class="release_date">Released: May 18, 1999</h5>
+                <div class="tracklist">
+                    <p>As Long As You Love Me</p>
+                    <p>Everybody (Backstreet's Back)</p>
+                    <p>All I Have to Give</p>
+                    <p>Get Down (You're the One for Me)</p>
+                    <p>If You Want It To Be Good Girl (Get Yourself a Bad Boy)</p>
+                </div>
+            </div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <span class="bsb-logo-text">BACKSTREET</span>
-                <span class="bsb-logo-accent">BOYS</span>
+    <section class="footer">
+        <footer>
+            <div class="footer-retro-branding">
+                <h4 class="footer-bsb-logo">BACKSTREET BOYS</h4>
+                <p class="footer-tagline">Keeping the Music Alive Since '93</p>
             </div>
-            <div class="social-links">
-                <a href="https://www.facebook.com/backstreetboys" target="_blank"><img src="image/facebook icon.jpg" alt="Facebook"></a>
-                <a href="https://www.instagram.com/backstreetboys" target="_blank"><img src="image/instagram icon.jpg" alt="Instagram"></a>
-                <a href="https://x.com/backstreetboys" target="_blank"><img src="image/twitter.jpg" alt="Twitter"></a>
-                <a href="https://www.youtube.com/user/bsbofficial" target="_blank"><img src="image/yt icon.jpg" alt="YouTube"></a>
-                <a href="https://open.spotify.com/artist/5rSXSAkZ67PYJSvpUpkOr7" target="_blank"><img src="image/spotify icon.jpg" alt="Spotify"></a>
-                <a href="https://www.tiktok.com/@backstreetboys" target="_blank"><img src="image/tiktok icon.jpg" alt="TikTok"></a>
-            </div>
-            <p class="copyright">© 2025 Backstreet Boys Fan Website. Made with ❤️ for BSB fans worldwide.</p>
-        </div>
-    </footer>
-
+            <section id="socials" class="CallToAction">
+                <a href="https://www.facebook.com/backstreetboys" class="facebook" target="_blank" rel="noopener noreferrer"><img src="facebook icon.jpg" alt="Facebook"></a>
+                <a href="https://www.instagram.com/backstreetboys" class="instagram" target="_blank" rel="noopener noreferrer"><img src="instagram icon.jpg" alt="Instagram"></a>
+                <a href="https://x.com/backstreetboys" class="twitter" target="_blank" rel="noopener noreferrer"><img src="twitter.jpg" alt="Twitter"></a>
+                <a href="https://www.youtube.com/user/bsbofficial" class="youtube" target="_blank" rel="noopener noreferrer"><img src="yt icon.jpg" alt="YouTube"></a>
+                <a href="https://open.spotify.com/artist/5rSXSAkZ67PYJSvpUpkOr7?nd=1&dlsi=ef4b4bf4085344ed" class="spotify" target="_blank" rel="noopener noreferrer"><img src="spotify icon.jpg" alt="Spotify"></a>
+                <a href="https://www.tiktok.com/@backstreetboys" class="tiktok" target="_blank" rel="noopener noreferrer"><img src="tiktok icon.jpg" alt="TikTok"></a>
+            </section>     
+            <div class="footer-decorative-line"></div>
+            <p class="copyright">© 2026 Backstreet Boys | All Rights Reserved</p>
+            <p class="fan-message">Made with ❤️ by fans, for fans</p>
+        </footer>
+    </section>
     <script src="script.js"></script>
 </body>
 </html>

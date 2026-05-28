@@ -1,102 +1,204 @@
-<?php
-/**
- * History Page - Database-connected version
- * Backstreet Boys Fan Website
- */
-
-include_once 'config/database.php';
-
-$database = new Database();
-$db = $database->getConnection();
-
-// Fetch timeline events from database
-$timelineQuery = "SELECT * FROM timeline_events ORDER BY event_year ASC";
-$timelineStmt = $db->prepare($timelineQuery);
-$timelineStmt->execute();
-$events = $timelineStmt->fetchAll(PDO::FETCH_ASSOC);
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>History - Backstreet Boys Timeline</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backstreet Boys</title>
     <link rel="stylesheet" href="website.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <!-- Retro Star Background -->
-    <div class="retro-bg-stars"></div>
-    <div class="retro-bg-grid"></div>
-    
     <section class="header">
         <header id="header">
             <div class="navigators">
                 <nav>
-                    <a href="home.php" class="home_nav">
-                        <span class="bsb-logo-text">BACKSTREET</span>
-                        <span class="bsb-logo-accent">BOYS</span>
-                    </a>
+                    <a href="home.php" class="home_nav">Backstreet Boys</a>
                     <a href="about.php" class="about_nav">About</a>
                     <a href="topSongs.php" class="topsongs_nav">Top Hits</a>
                     <a href="history.php" class="history">Band's History</a>
-                    <a href="login.php" class="login_btn">Dashboard</a>
                 </nav>
             </div>
         </header>
     </section>
 
-    <main class="history_main">
-        <section class="history_banner">
-            <h1>★ BAND HISTORY ★</h1>
-            <p>30 Years of Musical Excellence</p>
-            <div class="decorative-line"></div>
-        </section>
-
-        <section class="timeline_container">
-            <?php if (count($events) > 0): ?>
-                <div class="timeline">
-                    <?php foreach ($events as $event): ?>
-                        <div class="timeline-item <?php echo $event['position']; ?> <?php echo $event['is_highlight'] ? 'highlight' : ''; ?>">
-                            <div class="timeline-content">
-                                <span class="timeline-year"><?php echo htmlspecialchars($event['event_year']); ?></span>
-                                <h3><?php echo htmlspecialchars($event['title']); ?></h3>
-                                <p><?php echo htmlspecialchars($event['description']); ?></p>
-                                <?php if ($event['is_highlight']): ?>
-                                    <span class="highlight-badge">★ Highlight</span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+    <main class="contents_history">
+        <section class="history">
+            <div class="history-header">
+                <h1>Our Journey Through Time</h1>
+                <p>Three decades of music, memories, and milestones</p>
+            </div>
+            
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+                
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-90s">
+                        <div class="year-badge">1993</div>
+                        <h2>The Beginning</h2>
+                        <p>Formed in Orlando, Florida by Lou Pearlman. Original members: AJ McLean, Howie Dorough, 
+                        Nick Carter, Kevin Richardson, and Brian Littrell. First major performance at SeaWorld to 3,000 fans.</p>
+                    </div>
                 </div>
-            <?php else: ?>
-                <p class="no-events">No timeline events available at the moment.</p>
-            <?php endif; ?>
+
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-90s">
+                        <div class="year-badge">1996</div>
+                        <h2>International Debut</h2>
+                        <p>International debut album released. Won MTV Select Award for "Get Down (You're The One For Me)" 
+                        at the MTV European Music Awards.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-90s">
+                        <div class="year-badge">1997</div>
+                        <h2>Backstreet's Back</h2>
+                        <p>Released second album "Backstreet's Back." Won MTV Select Award for "As Long As You Love Me."</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-90s highlight">
+                        <div class="year-badge">1998</div>
+                        <h2>Global Domination</h2>
+                        <p>Won Billboard Award for Group Album of the Year, MuchMusic Video Award for Favorite International Group, 
+                        MTV VMA for Best Group Video ("Everybody"), and World Music Award for World's Best-Selling Dance Artist.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-90s highlight">
+                        <div class="year-badge">1999</div>
+                        <h2>Peak Success</h2>
+                        <p>Swept awards including Teen Choice, Kids' Choice, and American Music Awards. Dominated Billboard Music Awards 
+                        with Artist of the Year, Album of the Year, and multiple other categories.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-00s">
+                        <div class="year-badge">2000</div>
+                        <h2>Black & Blue Era</h2>
+                        <p>Released fourth album "Black & Blue," selling 1.6 million copies in the US first week. 
+                        Later certified platinum.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-00s">
+                        <div class="year-badge">2006</div>
+                        <h2>A Chapter Closes</h2>
+                        <p>Kevin Richardson announces his departure from the group.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-10s">
+                        <div class="year-badge">2011</div>
+                        <h2>NKOTBSB Supergroup</h2>
+                        <p>NKOTBSB supergroup formed with New Kids on the Block. Album debuted at #7 on the US charts.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-10s highlight">
+                        <div class="year-badge">2012</div>
+                        <h2>Kevin Returns</h2>
+                        <p>Kevin Richardson returns. Performed on Good Morning America's Summer Concert Series 
+                        to the largest crowd in GMA history.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-10s">
+                        <div class="year-badge">2013</div>
+                        <h2>20th Anniversary</h2>
+                        <p>Celebrated 20th Anniversary. Released "In A World Like This," debuting at #5 on Billboard 200—making them 
+                        the first act since Sade with nine US top 10 albums.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-10s">
+                        <div class="year-badge">2014</div>
+                        <h2>Hollywood Recognition</h2>
+                        <p>Won MTV Movie Award for Best Musical Moment ("This Is The End"). 
+                        Inducted into Walk of Fame in Locarno, Switzerland.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-10s">
+                        <div class="year-badge">2015</div>
+                        <h2>Hall of Fame</h2>
+                        <p>Brian Littrell and Kevin Richardson inducted into the Kentucky Music Hall of Fame.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-10s">
+                        <div class="year-badge">2018</div>
+                        <h2>New Music</h2>
+                        <p>Released "Don't Go Breaking My Heart," their first single in five years.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-20s">
+                        <div class="year-badge">2022</div>
+                        <h2>Christmas Album</h2>
+                        <p>"A Very Backstreet Christmas" released—their tenth album and first Christmas album. 
+                        Debuted at #1 on Billboard Top Holiday Albums and #17 on Billboard 200.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-20s">
+                        <div class="year-badge">2024</div>
+                        <h2>30th Anniversary</h2>
+                        <p>Celebrated 30th anniversary with fans in Cancun, Mexico.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content era-20s highlight">
+                        <div class="year-badge">2025</div>
+                        <h2>Millennium 2.0</h2>
+                        <p>Millennium 2.0 announced on Today Show, releasing July 11th to celebrate the 25th anniversary 
+                        of their 5-time GRAMMY-nominated chart-topping album.</p>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <span class="bsb-logo-text">BACKSTREET</span>
-                <span class="bsb-logo-accent">BOYS</span>
-            </div>
-            <div class="social-links">
-                <a href="https://www.facebook.com/backstreetboys" target="_blank"><img src="image/facebook icon.jpg" alt="Facebook"></a>
-                <a href="https://www.instagram.com/backstreetboys" target="_blank"><img src="image/instagram icon.jpg" alt="Instagram"></a>
-                <a href="https://x.com/backstreetboys" target="_blank"><img src="image/twitter.jpg" alt="Twitter"></a>
-                <a href="https://www.youtube.com/user/bsbofficial" target="_blank"><img src="image/yt icon.jpg" alt="YouTube"></a>
-                <a href="https://open.spotify.com/artist/5rSXSAkZ67PYJSvpUpkOr7" target="_blank"><img src="image/spotify icon.jpg" alt="Spotify"></a>
-                <a href="https://www.tiktok.com/@backstreetboys" target="_blank"><img src="image/tiktok icon.jpg" alt="TikTok"></a>
-            </div>
-            <p class="copyright">© 2025 Backstreet Boys Fan Website. Made with ❤️ for BSB fans worldwide.</p>
-        </div>
-    </footer>
-
+    <section class="footer">
+        <footer>
+            <section id="socials" class="CallToAction">
+                <a href="https://www.facebook.com/backstreetboys" class="facebook" target="_blank" rel="noopener noreferrer"><img src="facebook icon.jpg" alt="Facebook"></a>
+                <a href="https://www.instagram.com/backstreetboys" class="instagram" target="_blank" rel="noopener noreferrer"><img src="instagram icon.jpg" alt="Instagram"></a>
+                <a href="https://x.com/backstreetboys" class="twitter" target="_blank" rel="noopener noreferrer"><img src="twitter.jpg" alt="Twitter"></a>
+                <a href="https://www.youtube.com/user/bsbofficial" class="youtube" target="_blank" rel="noopener noreferrer"><img src="yt icon.jpg" alt="YouTube"></a>
+                <a href="https://open.spotify.com/artist/5rSXSAkZ67PYJSvpUpkOr7?nd=1&dlsi=ef4b4bf4085344ed" class="spotify" target="_blank" rel="noopener noreferrer"><img src="spotify icon.jpg" alt="Spotify"></a>
+                <a href="https://www.tiktok.com/@backstreetboys" class="tiktok" target="_blank" rel="noopener noreferrer"><img src="tiktok icon.jpg" alt="TikTok"></a>
+            </section>     
+            <p><br>© 2026 Backstreet Boys | All Rights Reserved</p>
+        </footer>
+    </section>
     <script src="script.js"></script>
 </body>
 </html>

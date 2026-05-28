@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Backstreet Boys Fan Club</title>
+    <title>Register - Backstreet Boys Fan Club</title>
     <link rel="stylesheet" href="website.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -24,6 +24,7 @@
             position: relative;
             overflow: hidden;
             color: #e4e4e4;
+            padding: 20px 0;
         }
 
         /* Subtle Background */
@@ -40,15 +41,15 @@
             z-index: 0;
         }
 
-        .login-container {
+        .register-container {
             position: relative;
             z-index: 10;
             width: 100%;
-            max-width: 420px;
+            max-width: 480px;
             padding: 20px;
         }
 
-        .login-card {
+        .register-card {
             background: rgba(30, 30, 50, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
@@ -91,7 +92,13 @@
         }
 
         .form-group {
-            margin-bottom: 22px;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
 
         .form-group label {
@@ -107,7 +114,8 @@
             position: relative;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 14px 16px 14px 44px;
             background: rgba(255, 255, 255, 0.05);
@@ -120,7 +128,8 @@
             outline: none;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             border-color: rgba(139, 92, 246, 0.5);
             background: rgba(255, 255, 255, 0.08);
             box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
@@ -128,6 +137,16 @@
 
         .form-group input::placeholder {
             color: #6b7280;
+        }
+
+        .form-group select {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .form-group select option {
+            background: #1e1e32;
+            color: #ffffff;
         }
 
         .input-icon {
@@ -140,11 +159,12 @@
             transition: color 0.2s ease;
         }
 
-        .form-group input:focus + .input-icon {
+        .form-group input:focus + .input-icon,
+        .form-group select:focus + .input-icon {
             color: #a78bfa;
         }
 
-        .login-btn {
+        .register-btn {
             width: 100%;
             padding: 14px;
             background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
@@ -158,15 +178,16 @@
             transition: all 0.2s ease;
             letter-spacing: 0.3px;
             box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+            margin-top: 8px;
         }
 
-        .login-btn:hover {
+        .register-btn:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
             background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         }
 
-        .login-btn:active {
+        .register-btn:active {
             transform: translateY(0);
         }
 
@@ -189,11 +210,6 @@
             text-decoration: underline;
         }
 
-        .divider {
-            color: #4b5563;
-            margin: 0 12px;
-        }
-
         .back-home {
             position: absolute;
             top: 24px;
@@ -214,8 +230,34 @@
             color: #ffffff;
         }
 
+        .terms {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-top: 8px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .terms input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin-right: 10px;
+            margin-top: 2px;
+            accent-color: #7c3aed;
+            cursor: pointer;
+        }
+
+        .terms a {
+            color: #a78bfa;
+            text-decoration: none;
+        }
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 480px) {
-            .login-card {
+            .register-card {
                 padding: 32px 24px;
             }
 
@@ -226,24 +268,46 @@
             .subtitle {
                 font-size: 0.9rem;
             }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="bg-gradient"></div>
 
-    <a href="home.html" class="back-home">
+    <a href="home.php" class="back-home">
         <i class="fas fa-arrow-left"></i> Back to Home
     </a>
 
-    <div class="login-container">
-        <div class="login-card">
+    <div class="register-container">
+        <div class="register-card">
             <div class="logo-section">
                 <h1 class="logo"><span>Backstreet Boys</span></h1>
-                <p class="subtitle">Welcome back! Please login to continue.</p>
+                <p class="subtitle">Join the fan club today!</p>
             </div>
 
-            <form id="loginForm">
+            <form id="registerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
+                            <i class="fas fa-user input-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="lastName" name="lastName" placeholder="Last Name" required>
+                            <i class="fas fa-user input-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="email">Email Address</label>
                     <div class="input-wrapper">
@@ -253,38 +317,89 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="username">Username</label>
                     <div class="input-wrapper">
-                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                        <i class="fas fa-lock input-icon"></i>
+                        <input type="text" id="username" name="username" placeholder="Choose a username" required>
+                        <i class="fas fa-at input-icon"></i>
                     </div>
                 </div>
 
-                <button type="submit" class="login-btn">
-                    Sign In
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" name="password" placeholder="Create password" required>
+                            <i class="fas fa-lock input-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+                            <i class="fas fa-lock input-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="favoriteMember">Favorite Member</label>
+                    <div class="input-wrapper">
+                        <select id="favoriteMember" name="favoriteMember" required>
+                            <option value="">Select your favorite</option>
+                            <option value="nick">Nick Carter</option>
+                            <option value="howie">Howie Dorough</option>
+                            <option value="aj">A.J. McLean</option>
+                            <option value="kevin">Kevin Richardson</option>
+                            <option value="brian">Brian Littrell</option>
+                        </select>
+                        <i class="fas fa-star input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="terms">
+                        <input type="checkbox" required>
+                        <span>I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a></span>
+                    </label>
+                </div>
+
+                <button type="submit" class="register-btn">
+                    Create Account
                 </button>
             </form>
 
             <div class="extra-links">
-                <a href="register.html">Create Account</a>
-                <span class="divider">|</span>
-                <a href="#">Forgot Password?</a>
+                <p>Already have an account? <a href="login.php">Login Here</a></p>
             </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const formData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value,
+                confirmPassword: document.getElementById('confirmPassword').value,
+                favoriteMember: document.getElementById('favoriteMember').value
+            };
             
-            // TODO: Integrate CRUD login functionality here
-            console.log('Login attempt:', { email, password });
+            // Validate passwords match
+            if (formData.password !== formData.confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            // TODO: Integrate CRUD registration functionality here
+            console.log('Registration attempt:', formData);
             
             // Placeholder for future CRUD integration
-            alert('Login functionality will be integrated soon!');
+            alert('Registration functionality will be integrated soon!');
         });
     </script>
 </body>
