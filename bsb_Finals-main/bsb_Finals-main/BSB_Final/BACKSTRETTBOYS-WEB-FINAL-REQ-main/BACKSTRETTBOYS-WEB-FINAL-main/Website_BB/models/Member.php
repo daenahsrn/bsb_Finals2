@@ -1,6 +1,7 @@
 <?php
 /**
- * Member Model - Handles database operations for band members (Characters)
+ * Member Model - Handles database operations for band members
+ * Matches the new database schema with: member_id, about_id, name, stage_name, birthdate, nationality, position, profile_img, bio
  */
 
 class Member {
@@ -15,7 +16,7 @@ class Member {
      * Get all members
      */
     public function getAll() {
-        $query = "SELECT * FROM " . $this->table . " ORDER BY member_number ASC";
+        $query = "SELECT * FROM " . $this->table . " ORDER BY name ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
@@ -36,23 +37,20 @@ class Member {
      */
     public function create($data) {
         $query = "INSERT INTO " . $this->table . " 
-                  (member_number, full_name, stage_name, birth_date, birth_place, role, description, image_filename, is_founding_member, joined_year, status) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                  (about_id, name, stage_name, birthdate, nationality, position, profile_img, bio) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
         $stmt = $this->conn->prepare($query);
         
         return $stmt->execute([
-            $data['member_number'],
-            $data['full_name'],
+            $data['about_id'] ?? null,
+            $data['name'],
             $data['stage_name'] ?? null,
-            $data['birth_date'] ?? null,
-            $data['birth_place'] ?? null,
-            $data['role'] ?? 'Vocalist',
-            $data['description'] ?? null,
-            $data['image_filename'] ?? null,
-            $data['is_founding_member'] ?? false,
-            $data['joined_year'] ?? date('Y'),
-            $data['status'] ?? 'active'
+            $data['birthdate'] ?? null,
+            $data['nationality'] ?? null,
+            $data['position'] ?? 'Vocalist',
+            $data['profile_img'] ?? null,
+            $data['bio'] ?? null
         ]);
     }
 
@@ -61,24 +59,21 @@ class Member {
      */
     public function update($id, $data) {
         $query = "UPDATE " . $this->table . " 
-                  SET member_number = ?, full_name = ?, stage_name = ?, birth_date = ?, birth_place = ?, 
-                      role = ?, description = ?, image_filename = ?, is_founding_member = ?, joined_year = ?, status = ?
+                  SET about_id = ?, name = ?, stage_name = ?, birthdate = ?, nationality = ?, 
+                      position = ?, profile_img = ?, bio = ?
                   WHERE member_id = ?";
         
         $stmt = $this->conn->prepare($query);
         
         return $stmt->execute([
-            $data['member_number'],
-            $data['full_name'],
+            $data['about_id'] ?? null,
+            $data['name'],
             $data['stage_name'] ?? null,
-            $data['birth_date'] ?? null,
-            $data['birth_place'] ?? null,
-            $data['role'] ?? 'Vocalist',
-            $data['description'] ?? null,
-            $data['image_filename'] ?? null,
-            $data['is_founding_member'] ?? false,
-            $data['joined_year'] ?? date('Y'),
-            $data['status'] ?? 'active',
+            $data['birthdate'] ?? null,
+            $data['nationality'] ?? null,
+            $data['position'] ?? 'Vocalist',
+            $data['profile_img'] ?? null,
+            $data['bio'] ?? null,
             $id
         ]);
     }

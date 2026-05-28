@@ -1,11 +1,12 @@
 <?php
 /**
- * Track Model - Handles database operations for album tracks/songs
+ * Track Model - Handles database operations for songs/tracks
+ * Matches the new database schema with: song_id, album_id, title, duration, track_no, lyrics, audio_file
  */
 
 class Track {
     private $conn;
-    private $table = "album_tracks";
+    private $table = "songs";
 
     public function __construct($db) {
         $this->conn = $db;
@@ -15,10 +16,10 @@ class Track {
      * Get all tracks with album info
      */
     public function getAll() {
-        $query = "SELECT t.*, a.title as album_title 
-                  FROM " . $this->table . " t 
-                  LEFT JOIN albums a ON t.album_id = a.album_id
-                  ORDER BY a.release_year DESC, t.track_number ASC";
+        $query = "SELECT s.*, a.title as album_title 
+                  FROM " . $this->table . " s 
+                  LEFT JOIN albums a ON s.album_id = a.album_id
+                  ORDER BY a.release DESC, s.track_no ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
@@ -28,7 +29,7 @@ class Track {
      * Get tracks by album ID
      */
     public function getByAlbumId($albumId) {
-        $query = "SELECT * FROM " . $this->table . " WHERE album_id = ? ORDER BY track_number ASC";
+        $query = "SELECT * FROM " . $this->table . " WHERE album_id = ? ORDER BY track_no ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute([$albumId]);
         return $stmt;
@@ -38,7 +39,7 @@ class Track {
      * Get single track by ID
      */
     public function getById($id) {
-        $query = "SELECT * FROM " . $this->table . " WHERE track_id = ?";
+        $query = "SELECT * FROM " . $this->table . " WHERE song_id = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->execute([$id]);
         return $stmt->fetch();
@@ -49,18 +50,18 @@ class Track {
      */
     public function create($data) {
         $query = "INSERT INTO " . $this->table . " 
-                  (album_id, track_number, title, duration, is_single, youtube_url) 
+                  (album_id, title, duration, track_no, lyrics, audio_file) 
                   VALUES (?, ?, ?, ?, ?, ?)";
         
         $stmt = $this->conn->prepare($query);
         
         return $stmt->execute([
             $data['album_id'],
-            $data['track_number'],
             $data['title'],
             $data['duration'] ?? null,
-            $data['is_single'] ?? false,
-            $data['youtube_url'] ?? null
+            $data['track_no'] ?? null,
+            $data['lyrics'] ?? null,
+            $data['audio_file'] ?? null
         ]);
     }
 
@@ -69,19 +70,18 @@ class Track {
      */
     public function update($id, $data) {
         $query = "UPDATE " . $this->table . " 
-                  SET album_id = ?, track_number = ?, title = ?, duration = ?, 
-                      is_single = ?, youtube_url = ?
-                  WHERE track_id = ?";
+                  SET album_id = ?, title = ?, duration = ?, track_no = ?, lyrics = ?, audio_file = ?
+                  WHERE song_id = ?";
         
         $stmt = $this->conn->prepare($query);
         
         return $stmt->execute([
             $data['album_id'],
-            $data['track_number'],
             $data['title'],
             $data['duration'] ?? null,
-            $data['is_single'] ?? false,
-            $data['youtube_url'] ?? null,
+            $data['track_no'] ?? null,
+            $data['lyrics'] ?? null,
+            $data['audio_file'] ?? null,
             $id
         ]);
     }
@@ -90,7 +90,7 @@ class Track {
      * Delete track
      */
     public function delete($id) {
-        $query = "DELETE FROM " . $this->table . " WHERE track_id = ?";
+        $query = "DELETE FROM " . $this->table . " WHERE song_id = ?";
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([$id]);
     }

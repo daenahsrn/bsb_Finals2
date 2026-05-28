@@ -43,7 +43,7 @@ $members = $membersStmt->fetchAll(PDO::FETCH_ASSOC);
                     <a href="about.php" class="about_nav">About</a>
                     <a href="topSongs.php" class="topsongs_nav">Top Hits</a>
                     <a href="history.php" class="history">Band's History</a>
-                    <a href="dashboard.php" class="login_btn">Dashboard</a>
+                    <a href="login.php" class="login_btn">Dashboard</a>
                 </nav>
             </div>
         </header>

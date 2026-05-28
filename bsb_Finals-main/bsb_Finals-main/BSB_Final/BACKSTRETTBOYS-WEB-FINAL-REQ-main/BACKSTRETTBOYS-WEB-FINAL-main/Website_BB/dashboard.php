@@ -4,6 +4,14 @@
  * Database-connected version with CRUD functionality
  */
 
+session_start();
+
+// Check if admin is logged in
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    header('Location: login.php');
+    exit;
+}
+
 include_once 'config/database.php';
 include_once 'models/Member.php';
 include_once 'models/Album.php';
@@ -837,9 +845,9 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
             <a href="home.php" class="view-site-btn">
                 <i class="fas fa-external-link-alt"></i> View Website
             </a>
-            <button class="logout-btn" onclick="alert('Logout functionality')">
+            <a href="logout.php" class="logout-btn">
                 <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
+            </a>
         </div>
     </header>
 
