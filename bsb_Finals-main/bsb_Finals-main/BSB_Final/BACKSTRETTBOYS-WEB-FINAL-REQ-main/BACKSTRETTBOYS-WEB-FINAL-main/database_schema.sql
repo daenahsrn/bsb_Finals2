@@ -73,6 +73,7 @@ CREATE TABLE songs (
 CREATE TABLE history (
     timeline_id INT AUTO_INCREMENT PRIMARY KEY,
     year DATE, -- Storing as Date to allow specific dates if needed, or just Year-01-01
+    title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     last_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -120,10 +121,12 @@ INSERT INTO songs (album_id, title, duration, track_no, lyrics, audio_file) VALU
 (3, 'Show Me The Meaning Of Being Lonely', '03:50', 3, 'Lyrics here...', 'audio/mil_03.mp3');
 
 -- History Timeline
-INSERT INTO history (year, description) VALUES 
-('1993-04-20', 'The group is formed in Orlando, Florida.'),
-('1996-05-06', 'Debut album released internationally.'),
-('1997-08-11', 'Released "Backstreet\'s Back", breaking them in the US.'),
-('1999-05-18', '"Millennium" released, selling 1.13 million copies in week one.'),
-('2001-02-05', 'Kevin Richardson leaves the group.'),
-('2012-04-29', 'Kevin Richardson officially rejoins the group.');
+-- History Timeline (with title field)
+DELETE FROM history;
+INSERT INTO history (year, title, description) VALUES
+('1993-04-20', 'The Beginning', 'The group is formed in Orlando, Florida.'),
+('1996-05-06', 'International Debut', 'Debut album released internationally.'),
+('1997-08-11', 'Backstreet''s Back', 'Released "Backstreet''s Back", breaking them in the US.'),
+('1999-05-18', 'Millennium Era', '"Millennium" released, selling 1.13 million copies in week one.'),
+('2001-02-05', 'Kevin Leaves', 'Kevin Richardson leaves the group.'),
+('2012-04-29', 'Kevin Returns', 'Kevin Richardson officially rejoins the group.');
