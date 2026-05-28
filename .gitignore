@@ -1,25 +1,79 @@
 ```
 # Dependencies
-vendor/
+node_modules/
 
-# Logs and temp files
+# Build artifacts
+dist/
+build/
+*.o
+*.obj
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+
+# Logs
 *.log
-*.tmp
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# IDE files
+# Editors
 .vscode/
 .idea/
+*.swp
+*.swo
+*.tmp
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
 
-# PHP specific
-*.php~
-*.php.bak
+# Testing
+.coverage
+coverage/
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# Java/Maven
+target/
+.gradle/
+*.class
+
+# Go
+*.exe
+*.dll
+*.so
+
+# Compression
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```
