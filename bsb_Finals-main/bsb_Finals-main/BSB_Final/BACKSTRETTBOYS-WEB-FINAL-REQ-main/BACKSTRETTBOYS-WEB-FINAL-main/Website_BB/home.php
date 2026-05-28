@@ -1,20 +1,3 @@
-<?php
-/**
- * Home Page - Database-connected version
- * Backstreet Boys Fan Website
- */
-
-include_once 'config/database.php';
-
-$database = new Database();
-$db = $database->getConnection();
-
-// Fetch top hit songs from database
-$songsQuery = "SELECT * FROM songs WHERE is_hit = 1 ORDER BY hit_rank ASC LIMIT 10";
-$songsStmt = $db->prepare($songsQuery);
-$songsStmt->execute();
-$songs = $songsStmt->fetchAll(PDO::FETCH_ASSOC);
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,6 +50,20 @@ $songs = $songsStmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </section>
 
+        <!-- Welcome Message -->
+        <section class="welcome-section">
+            <div class="welcome-container">
+                <div class="welcome-badge">
+                    <span class="badge-star">★</span>
+                    <span>LEGENDARY</span>
+                    <span class="badge-star">★</span>
+                </div>
+                <h2 class="welcome-title">Welcome to the Ultimate Fan Experience</h2>
+                <p class="welcome-text">Journey through decades of unforgettable hits, iconic performances, and the timeless music that defined a generation. From Orlando to the world stage.</p>
+                <div class="welcome-signature">— The Backstreet Legacy —</div>
+            </div>
+        </section>
+
         <!-- Music Links Section - Retro Jukebox Style -->
         <section class="music_Home">
             <div class="jukebox-header">
@@ -75,17 +72,21 @@ $songs = $songsStmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="jukebox-lights"></div>
             </div>
             <div class="music_container">
-                <?php if (count($songs) > 0): ?>
-                    <?php foreach ($songs as $index => $song): ?>
-                        <a href="<?php echo htmlspecialchars($song['youtube_url'] ?? '#'); ?>" class="hit-song" target="_blank" rel="noopener noreferrer">
-                            <span class="song-number"><?php echo str_pad($index + 1, 2, '0', STR_PAD_LEFT); ?></span>
-                            <span class="song-title"><?php echo htmlspecialchars($song['title']); ?></span>
-                            <span class="song-year"><?php echo htmlspecialchars($song['release_year']); ?></span>
-                        </a>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p class="no-songs">No hit songs available at the moment.</p>
-                <?php endif; ?>
+                <a href="https://www.youtube.com/watch?v=VVB6FI8QTFg&list=RDVVB6FI8QTFg&start_radio=1" class="IWantItThatWay" target="_blank" rel="noopener noreferrer">
+                    <span class="song-number">01</span>
+                    <span class="song-title">I Want It That Way</span>
+                    <span class="song-year">1999</span>
+                </a>
+                <a href="https://www.youtube.com/watch?v=0Gl2QnHNpkA&list=RD0Gl2QnHNpkA&start_radio=1" class="AsALongAsYouLoveMe" target="_blank" rel="noopener noreferrer">
+                    <span class="song-number">02</span>
+                    <span class="song-title">As Long As You Love Me</span>
+                    <span class="song-year">1997</span>
+                </a>
+                <a href="https://www.youtube.com/watch?v=6M6samPEMpM&list=RD6M6samPEMpM&start_radio=1" class="Everybody(BSBack)" target="_blank" rel="noopener noreferrer">
+                    <span class="song-number">03</span>
+                    <span class="song-title">Everybody (Backstreet's Back)</span>
+                    <span class="song-year">1997</span>
+                </a>
             </div>
             <div class="music-decoration">
                 <span class="music-note">♪</span>
@@ -97,86 +98,93 @@ $songs = $songsStmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Preview Cards - Vintage Album Style -->
         <section class="previews">
             <div class="previews-header">
-                <h2>LATEST ALBUMS</h2>
-                <div class="decorative-dots">
-                    <span></span><span></span><span></span>
+                <h2 class="previews-main-title">EXPLORE THE LEGACY</h2>
+                <div class="previews-decorative-line"></div>
+            </div>
+            <div class="preview-container">
+                <div class="preview-card">
+                    <div class="card-vintage-frame"></div>
+                    <div class="card-corner-tl"></div>
+                    <div class="card-corner-tr"></div>
+                    <div class="card-corner-bl"></div>
+                    <div class="card-corner-br"></div>
+                    <div class="card-icon">📖</div>
+                    <h3>About the Band</h3>
+                    <p>Discover the story behind Nick, Kevin, AJ, Howie, and Brian—the kings of pop who took the world by storm.</p>
+                    <a href="about.php" class="preview-link">Learn More →</a>
+                </div>
+
+                <div class="preview-card">
+                    <div class="card-vintage-frame"></div>
+                    <div class="card-corner-tl"></div>
+                    <div class="card-corner-tr"></div>
+                    <div class="card-corner-bl"></div>
+                    <div class="card-corner-br"></div>
+                    <div class="card-icon">💿</div>
+                    <h3>Preview their Top Releases</h3>
+                    <p>Such as I want it that way, Everybody (Backstreet's Back), and more...</p>
+                    <a href="topSongs.php" class="preview-link">Explore Songs →</a>
                 </div>
             </div>
-            <div class="preview-cards-container">
-                <a href="topSongs.php" class="preview-card album-preview">
-                    <div class="card-vintage-frame">
-                        <div class="frame-corner top-left"></div>
-                        <div class="frame-corner top-right"></div>
-                        <div class="frame-corner bottom-left"></div>
-                        <div class="frame-corner bottom-right"></div>
-                        <img src="image/millenium 2.0.jpg" alt="Millennium 2.0">
-                    </div>
-                    <div class="preview-info">
-                        <h3>Millennium 2.0</h3>
-                        <p>25th Anniversary Edition</p>
-                    </div>
-                </a>
-                <a href="topSongs.php" class="preview-card album-preview">
-                    <div class="card-vintage-frame">
-                        <div class="frame-corner top-left"></div>
-                        <div class="frame-corner top-right"></div>
-                        <div class="frame-corner bottom-left"></div>
-                        <div class="frame-corner bottom-right"></div>
-                        <img src="image/christmasAlbum.jpg" alt="Christmas Album">
-                    </div>
-                    <div class="preview-info">
-                        <h3>A Very Backstreet Christmas</h3>
-                        <p>Holiday Collection</p>
-                    </div>
-                </a>
-                <a href="topSongs.php" class="preview-card album-preview">
-                    <div class="card-vintage-frame">
-                        <div class="frame-corner top-left"></div>
-                        <div class="frame-corner top-right"></div>
-                        <div class="frame-corner bottom-left"></div>
-                        <div class="frame-corner bottom-right"></div>
-                        <img src="image/DNAAlbum.jpg" alt="DNA">
-                    </div>
-                    <div class="preview-info">
-                        <h3>DNA</h3>
-                        <p>Genetic Masterpiece</p>
-                    </div>
-                </a>
+        </section>
+
+        <!-- Retro Divider -->
+        <div class="retro-divider">
+            <span class="divider-star">✦</span>
+            <span class="divider-line"></span>
+            <span class="divider-star">✦</span>
+            <span class="divider-text">EST. 1993 ORLANDO, FLORIDA</span>
+            <span class="divider-line"></span>
+            <span class="divider-star">✦</span>
+        </div>
+
+        <!-- Member Quick Links -->
+        <section class="member-highlights">
+            <h3 class="members-title">MEET THE LEGENDS</h3>
+            <div class="members-grid">
+                <div class="member-mini-card">
+                    <div class="member-initial">N</div>
+                    <span class="member-name">Nick Carter</span>
+                </div>
+                <div class="member-mini-card">
+                    <div class="member-initial">K</div>
+                    <span class="member-name">Kevin Richardson</span>
+                </div>
+                <div class="member-mini-card">
+                    <div class="member-initial">A</div>
+                    <span class="member-name">AJ McLean</span>
+                </div>
+                <div class="member-mini-card">
+                    <div class="member-initial">H</div>
+                    <span class="member-name">Howie Dorough</span>
+                </div>
+                <div class="member-mini-card">
+                    <div class="member-initial">B</div>
+                    <span class="member-name">Brian Littrell</span>
+                </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <span class="bsb-logo-text">BACKSTREET</span>
-                <span class="bsb-logo-accent">BOYS</span>
+    <section class="footer">
+        <footer>
+            <div class="footer-retro-branding">
+                <h4 class="footer-bsb-logo">BACKSTREET BOYS</h4>
+                <p class="footer-tagline">Keeping the Music Alive Since '93</p>
             </div>
-            <div class="social-links">
-                <a href="https://www.facebook.com/backstreetboys" target="_blank" rel="noopener noreferrer">
-                    <img src="image/facebook icon.jpg" alt="Facebook">
-                </a>
-                <a href="https://www.instagram.com/backstreetboys" target="_blank" rel="noopener noreferrer">
-                    <img src="image/instagram icon.jpg" alt="Instagram">
-                </a>
-                <a href="https://x.com/backstreetboys" target="_blank" rel="noopener noreferrer">
-                    <img src="image/twitter.jpg" alt="Twitter">
-                </a>
-                <a href="https://www.youtube.com/user/bsbofficial" target="_blank" rel="noopener noreferrer">
-                    <img src="image/yt icon.jpg" alt="YouTube">
-                </a>
-                <a href="https://open.spotify.com/artist/5rSXSAkZ67PYJSvpUpkOr7" target="_blank" rel="noopener noreferrer">
-                    <img src="image/spotify icon.jpg" alt="Spotify">
-                </a>
-                <a href="https://www.tiktok.com/@backstreetboys" target="_blank" rel="noopener noreferrer">
-                    <img src="image/tiktok icon.jpg" alt="TikTok">
-                </a>
-            </div>
-            <p class="copyright">© 2025 Backstreet Boys Fan Website. Made with ❤️ for BSB fans worldwide.</p>
-        </div>
-    </footer>
-
+            <section id="socials" class="CallToAction">
+                <a href="https://www.facebook.com/backstreetboys" class="facebook" target="_blank" rel="noopener noreferrer"><img src="facebook icon.jpg" alt="Facebook"></a>
+                <a href="https://www.instagram.com/backstreetboys" class="instagram" target="_blank" rel="noopener noreferrer"><img src="instagram icon.jpg" alt="Instagram"></a>
+                <a href="https://x.com/backstreetboys" class="twitter" target="_blank" rel="noopener noreferrer"><img src="twitter.jpg" alt="Twitter"></a>
+                <a href="https://www.youtube.com/user/bsbofficial" class="youtube" target="_blank" rel="noopener noreferrer"><img src="yt icon.jpg" alt="YouTube"></a>
+                <a href="https://open.spotify.com/artist/5rSXSAkZ67PYJSvpUpkOr7?nd=1&dlsi=ef4b4bf4085344ed" class="spotify" target="_blank" rel="noopener noreferrer"><img src="spotify icon.jpg" alt="Spotify"></a>
+                <a href="https://www.tiktok.com/@backstreetboys" class="tiktok" target="_blank" rel="noopener noreferrer"><img src="tiktok icon.jpg" alt="TikTok"></a>
+            </section>     
+            <div class="footer-decorative-line"></div>
+            <p class="copyright">© 2026 Backstreet Boys | All Rights Reserved</p>
+            <p class="fan-message">Made with ❤️ by fans, for fans</p>
+        </footer>
+    </section>
     <script src="script.js"></script>
 </body>
 </html>

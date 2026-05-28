@@ -1,61 +1,10 @@
-<?php
-/**
- * Admin Login - Backstreet Boys Fan Website
- * Authenticates admins using username and password
- */
-
-session_start();
-include_once 'config/database.php';
-
-// Redirect if already logged in
-if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
-    header('Location: dashboard.php');
-    exit;
-}
-
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
-    
-    if (empty($username) || empty($password)) {
-        $error = 'Please enter both username and password.';
-    } else {
-        try {
-            $database = new Database();
-            $db = $database->getConnection();
-            
-            // Query admin by username
-            $query = "SELECT admin_id, username, password FROM admins WHERE username = ?";
-            $stmt = $db->prepare($query);
-            $stmt->execute([$username]);
-            $admin = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($admin && password_verify($password, $admin['password'])) {
-                // Login successful
-                $_SESSION['admin_logged_in'] = true;
-                $_SESSION['admin_id'] = $admin['admin_id'];
-                $_SESSION['admin_username'] = $admin['username'];
-                
-                header('Location: dashboard.php');
-                exit;
-            } else {
-                $error = 'Invalid username or password.';
-            }
-        } catch (PDOException $e) {
-            $error = 'Database error. Please try again later.';
-            error_log($e->getMessage());
-        }
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Backstreet Boys Fan Club</title>
+    <link rel="stylesheet" href="website.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -77,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #e4e4e4;
         }
 
+        /* Subtle Background */
         .bg-gradient {
             position: fixed;
             top: 0;
@@ -220,20 +170,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transform: translateY(0);
         }
 
-        .error-message {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            color: #fca5a5;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
         .extra-links {
             margin-top: 28px;
             text-align: center;
@@ -307,18 +243,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p class="subtitle">Welcome back! Please login to continue.</p>
             </div>
 
-            <?php if (!empty($error)): ?>
-                <div class="error-message">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span><?php echo htmlspecialchars($error); ?></span>
-                </div>
-            <?php endif; ?>
-
-            <form method="POST" action="">
+            <form id="loginForm" action="dashboard.php" method="POST">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <div class="input-wrapper">
-                        <input type="text" id="username" name="username" placeholder="Enter your username" required value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
+                        <input type="text" id="username" name="username" placeholder="Enter your username" required>
                         <i class="fas fa-user input-icon"></i>
                     </div>
                 </div>
@@ -337,9 +266,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
 
             <div class="extra-links">
-                <p style="color: #6b7280; font-size: 0.85rem;">Default login: <strong style="color: #a78bfa;">username: admin</strong> | <strong style="color: #a78bfa;">password: password</strong></p>
+                <a href="register.php">Create Account</a>
+                <span class="divider">|</span>
+                <a href="#">Forgot Password?</a>
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            // Form will submit normally to dashboard.php
+            // Dashboard.php will handle authentication
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if(!username || !password) {
+                e.preventDefault();
+                alert('Please enter both username and password');
+                return false;
+            }
+        });
+    </script>
 </body>
 </html>

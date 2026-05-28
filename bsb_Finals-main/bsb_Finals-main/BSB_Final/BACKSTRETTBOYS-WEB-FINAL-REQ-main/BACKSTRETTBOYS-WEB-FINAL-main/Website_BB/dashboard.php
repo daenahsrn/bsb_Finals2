@@ -1,39 +1,52 @@
 <?php
-/**
- * Admin Dashboard - Backstreet Boys Fan Website
- * Database-connected version with CRUD functionality
- */
-
 session_start();
 
-// Check if admin is logged in
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header('Location: login.php');
-    exit;
+// Handle login submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset($_POST['password'])) {
+    require_once 'config/database.php';
+    
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    
+    $stmt = $conn->prepare("SELECT admin_id, username, password FROM admins WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 1) {
+        $admin = $result->fetch_assoc();
+        // For now, simple password check (in production, use password_verify)
+        if ($password === $admin['password']) {
+            $_SESSION['admin_id'] = $admin['admin_id'];
+            $_SESSION['username'] = $admin['username'];
+            $_SESSION['logged_in'] = true;
+            header("Location: dashboard.php");
+            exit();
+        } else {
+            $error = "Invalid password!";
+        }
+    } else {
+        $error = "Username not found!";
+    }
+    $stmt->close();
 }
 
-include_once 'config/database.php';
-include_once 'models/Member.php';
-include_once 'models/Album.php';
+// Check if admin is logged in
+$is_logged_in = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
 
-$database = new Database();
-$db = $database->getConnection();
+// If not logged in and trying to access dashboard, show login form
+if (!$is_logged_in && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // Redirect to login page or show login form
+    header("Location: login.php");
+    exit();
+}
 
-// Initialize models
-$member = new Member($db);
-$album = new Album($db);
-
-// Get counts for stats
-$membersCount = $member->getCount();
-$albumsCount = $album->getCount();
-
-// Fetch all members
-$membersStmt = $member->getAll();
-$members = $membersStmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch all albums with tracks
-$albumsStmt = $album->getAll();
-$albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
+// Handle logout
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: login.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,7 +110,7 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
             50% { opacity: 1; }
         }
 
-        /* Header */
+        /* Header - Matching Website Style */
         .dashboard-header {
             background: rgba(20, 20, 40, 0.9);
             border-bottom: 2px solid rgba(139, 92, 246, 0.3);
@@ -136,6 +149,13 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
             display: flex;
             align-items: center;
             gap: 20px;
+        }
+
+        .welcome-text {
+            font-family: 'DM Sans', sans-serif;
+            color: #9ca3af;
+            font-size: 0.95rem;
+            font-weight: 500;
         }
 
         .admin-badge {
@@ -474,6 +494,11 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
             color: #ffffff;
         }
 
+        .member-email {
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+
         .status-badge {
             padding: 5px 14px;
             border-radius: 20px;
@@ -488,6 +513,18 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
             background: rgba(34, 197, 94, 0.15);
             color: #22c55e;
             border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-inactive {
+            background: rgba(107, 114, 128, 0.15);
+            color: #6b7280;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+
+        .status-premium {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
         /* Action Buttons */
@@ -519,6 +556,26 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
+        .action-btn.hits {
+            background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+            color: #fff;
+        }
+
+        .action-btn.hits:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
+        }
+
+        .action-btn.history {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+        }
+
+        .action-btn.history:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
         .action-btn.delete {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: #fff;
@@ -527,25 +584,6 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
         .action-btn.delete:hover {
             transform: scale(1.1);
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-        }
-
-        .view-site-btn {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .view-site-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
         }
 
         /* Modal Styles */
@@ -610,6 +648,10 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
             display: flex;
             align-items: center;
             gap: 12px;
+        }
+
+        .modal-title i {
+            color: #a78bfa;
         }
 
         .close-modal {
@@ -746,56 +788,252 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5);
         }
 
-        /* Albums Grid */
-        .albums-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+        /* Top Hits List in Modal */
+        .hits-list {
+            list-style: none;
+            margin-top: 10px;
         }
 
-        .album-card {
+        .hit-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
             background: rgba(139, 92, 246, 0.05);
             border: 1px solid rgba(139, 92, 246, 0.1);
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 10px;
             transition: all 0.3s ease;
         }
 
-        .album-card:hover {
+        .hit-item:hover {
             background: rgba(139, 92, 246, 0.1);
-            border-color: rgba(139, 92, 246, 0.3);
-            transform: translateY(-4px);
+            border-color: rgba(139, 92, 246, 0.2);
         }
 
-        .album-cover {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            background: rgba(139, 92, 246, 0.1);
-        }
-
-        .album-title {
+        .hit-rank {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-family: 'Cinzel', serif;
+            font-weight: 700;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .hit-details {
+            flex: 1;
+        }
+
+        .hit-title {
+            font-family: 'DM Sans', sans-serif;
             color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .hit-album {
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+
+        .hit-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .hit-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+        .hit-action-btn.up {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .hit-action-btn.down {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .hit-action-btn.remove {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .hit-action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* History Timeline in Modal */
+        .history-timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 20px;
+        }
+
+        .history-timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+        }
+
+        .history-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding: 18px 22px;
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        .history-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 24px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+            border: 2px solid rgba(30, 30, 60, 0.9);
+        }
+
+        .history-year {
+            font-family: 'Cinzel', serif;
+            color: #a78bfa;
             font-size: 1.1rem;
             font-weight: 700;
             margin-bottom: 8px;
         }
 
-        .album-year {
-            color: #a78bfa;
+        .history-title {
+            font-family: 'DM Sans', sans-serif;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .history-description {
             font-size: 0.9rem;
-            margin-bottom: 12px;
-        }
-
-        .album-tracks {
             color: #9ca3af;
-            font-size: 0.85rem;
+            line-height: 1.6;
         }
 
+        /* Search & Filter Bar */
+        .toolbar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 18px 12px 45px;
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #a78bfa;
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #a78bfa;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 28px;
+        }
+
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            background: transparent;
+            color: #9ca3af;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn:hover,
+        .page-btn.active {
+            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+            border-color: transparent;
+            color: #fff;
+        }
+
+        /* Responsive */
         @media (max-width: 1024px) {
             .dashboard-container {
                 grid-template-columns: 1fr;
@@ -829,6 +1067,25 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
             .form-row {
                 grid-template-columns: 1fr;
             }
+
+            .members-table {
+                font-size: 0.85rem;
+            }
+
+            .members-table th,
+            .members-table td {
+                padding: 12px 8px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .action-btn {
+                width: 32px;
+                height: 32px;
+            }
         }
     </style>
 </head>
@@ -842,12 +1099,10 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
         <h1 class="logo"><i class="fas fa-music"></i> <span>BACKSTREET</span> BOYS</h1>
         <div class="user-info">
             <span class="admin-badge">Admin</span>
-            <a href="home.php" class="view-site-btn">
-                <i class="fas fa-external-link-alt"></i> View Website
-            </a>
-            <a href="logout.php" class="logout-btn">
+            <span class="welcome-text">Welcome, Admin!</span>
+            <button class="logout-btn" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i> Logout
-            </a>
+            </button>
         </div>
     </header>
 
@@ -865,18 +1120,24 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
                 <li class="nav-item">
                     <a href="#members-section" class="nav-link active">
                         <i class="fas fa-users"></i>
-                        <span>Members (Characters)</span>
+                        <span>Members</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#albums-section" class="nav-link">
-                        <i class="fas fa-compact-disc"></i>
-                        <span>Albums (Movies)</span>
+                    <a href="#tophits-section" class="nav-link">
+                        <i class="fas fa-trophy"></i>
+                        <span>Top Hits</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#history-section" class="nav-link">
+                        <i class="fas fa-history"></i>
+                        <span>History</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="home.php" class="nav-link">
-                        <i class="fas fa-home"></i>
+                        <i class="fas fa-external-link-alt"></i>
                         <span>View Site</span>
                     </a>
                 </li>
@@ -890,11 +1151,25 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="card-header">
                     <h2 class="card-title">
                         <i class="fas fa-users"></i>
-                        Members Management (Characters)
+                        Members Management
                     </h2>
                     <button class="add-new-btn" onclick="openMemberModal()">
                         <i class="fas fa-plus"></i> Add Member
                     </button>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="memberSearch" placeholder="Search members..." onkeyup="filterMembers()">
+                    </div>
+                    <select class="filter-select" id="statusFilter" onchange="filterMembers()">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="premium">Premium</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
                 </div>
 
                 <!-- Stats -->
@@ -903,22 +1178,29 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="stat-icon">
                             <i class="fas fa-users"></i>
                         </div>
-                        <div class="stat-value"><?php echo $membersCount; ?></div>
+                        <div class="stat-value" id="totalMembers">5</div>
                         <div class="stat-label">Total Members</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <div class="stat-value"><?php echo count(array_filter($members, fn($m) => $m['is_founding_member'])); ?></div>
-                        <div class="stat-label">Founding Members</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-check-circle"></i>
                         </div>
-                        <div class="stat-value"><?php echo count(array_filter($members, fn($m) => $m['status'] === 'active')); ?></div>
+                        <div class="stat-value" id="activeMembers">3</div>
                         <div class="stat-label">Active</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-value" id="premiumMembers">1</div>
+                        <div class="stat-label">Premium</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="stat-value" id="newMembers">2</div>
+                        <div class="stat-label">New This Month</div>
                     </div>
                 </div>
 
@@ -927,116 +1209,121 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
                     <thead>
                         <tr>
                             <th>Member</th>
-                            <th>Role</th>
-                            <th>Born</th>
+                            <th>Email</th>
+                            <th>Favorite Member</th>
+                            <th>Join Date</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="membersTableBody">
-                        <?php foreach ($members as $member): ?>
-                        <tr>
-                            <td>
-                                <div class="member-info">
-                                    <div class="member-avatar">
-                                        <?php echo strtoupper(substr($member['full_name'], 0, 1)); ?>
-                                    </div>
-                                    <div>
-                                        <div class="member-name"><?php echo htmlspecialchars($member['full_name']); ?></div>
-                                        <small style="color: #9ca3af;"><?php echo htmlspecialchars($member['stage_name'] ?? ''); ?></small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><?php echo htmlspecialchars($member['role']); ?></td>
-                            <td><?php echo $member['birth_date'] ? date('M d, Y', strtotime($member['birth_date'])) : 'N/A'; ?></td>
-                            <td><span class="status-badge status-active"><?php echo htmlspecialchars($member['status']); ?></span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="action-btn edit" onclick="editMember(<?php echo $member['member_id']; ?>)" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="action-btn delete" onclick="deleteMember(<?php echo $member['member_id']; ?>, '<?php echo htmlspecialchars($member['full_name']); ?>')" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                        <!-- Members will be loaded dynamically -->
                     </tbody>
                 </table>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
             </div>
 
-            <!-- Albums Section -->
-            <div class="content-card" id="albums-section">
+            <!-- Top Hits Section -->
+            <div class="content-card" id="tophits-section">
                 <div class="card-header">
                     <h2 class="card-title">
-                        <i class="fas fa-compact-disc"></i>
-                        Albums Management (Movies)
+                        <i class="fas fa-trophy"></i>
+                        Top Hits Management
                     </h2>
-                    <button class="add-new-btn" onclick="openAlbumModal()">
-                        <i class="fas fa-plus"></i> Add Album
+                    <button class="add-new-btn" onclick="openTopHitsModal()">
+                        <i class="fas fa-plus"></i> Add Hit
                     </button>
                 </div>
 
-                <!-- Stats -->
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-album"></i>
-                        </div>
-                        <div class="stat-value"><?php echo $albumsCount; ?></div>
-                        <div class="stat-label">Total Albums</div>
-                    </div>
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-music"></i>
                         </div>
-                        <div class="stat-value"><?php echo array_sum(array_column($albums, 'track_count')); ?></div>
-                        <div class="stat-label">Total Tracks</div>
+                        <div class="stat-value">25</div>
+                        <div class="stat-label">Total Hits</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <i class="fas fa-highlighter"></i>
+                            <i class="fas fa-play"></i>
                         </div>
-                        <div class="stat-value"><?php echo count(array_filter($albums, fn($a) => $a['is_highlight'])); ?></div>
-                        <div class="stat-label">Featured</div>
+                        <div class="stat-value">1.2M</div>
+                        <div class="stat-label">Total Streams</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-value">850K</div>
+                        <div class="stat-label">Favorites</div>
                     </div>
                 </div>
 
-                <!-- Albums Grid -->
-                <div class="albums-grid">
-                    <?php foreach ($albums as $album): ?>
-                    <div class="album-card">
-                        <?php if ($album['cover_image_filename']): ?>
-                        <img src="image/<?php echo htmlspecialchars($album['cover_image_filename']); ?>" alt="<?php echo htmlspecialchars($album['title']); ?>" class="album-cover" onerror="this.style.display='none'">
-                        <?php endif; ?>
-                        <h3 class="album-title"><?php echo htmlspecialchars($album['title']); ?></h3>
-                        <p class="album-year">Released: <?php echo $album['release_date'] ? date('M d, Y', strtotime($album['release_date'])) : $album['release_year']; ?></p>
-                        <p class="album-tracks">
-                            <i class="fas fa-music"></i> <?php echo $album['track_count']; ?> tracks
-                        </p>
-                        <div class="action-buttons" style="margin-top: 16px;">
-                            <button class="action-btn edit" onclick="editAlbum(<?php echo $album['album_id']; ?>)" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete" onclick="deleteAlbum(<?php echo $album['album_id']; ?>, '<?php echo htmlspecialchars($album['title']); ?>')" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
+                <p style="color: #9ca3af; text-align: center; padding: 40px;">
+                    <i class="fas fa-info-circle" style="color: #a78bfa; margin-right: 8px;"></i>
+                    Manage top hits through individual member profiles or use the bulk editor
+                </p>
+            </div>
+
+            <!-- History Section -->
+            <div class="content-card" id="history-section">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-history"></i>
+                        Band History Management
+                    </h2>
+                    <button class="add-new-btn" onclick="openHistoryModal()">
+                        <i class="fas fa-plus"></i> Add Event
+                    </button>
                 </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-value">32</div>
+                        <div class="stat-label">Timeline Events</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <div class="stat-value">150+</div>
+                        <div class="stat-label">Awards Won</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-album"></i>
+                        </div>
+                        <div class="stat-value">10</div>
+                        <div class="stat-label">Studio Albums</div>
+                    </div>
+                </div>
+
+                <p style="color: #9ca3af; text-align: center; padding: 40px;">
+                    <i class="fas fa-info-circle" style="color: #a78bfa; margin-right: 8px;"></i>
+                    Edit the band's timeline and historical events
+                </p>
             </div>
         </main>
     </div>
 
-    <!-- Member Modal -->
+    <!-- Edit/Create Member Modal -->
     <div class="modal-overlay" id="memberModal">
         <div class="modal-container">
             <div class="modal-header">
                 <h3 class="modal-title">
                     <i class="fas fa-user-edit"></i>
-                    <span id="memberModalTitle">Edit Member</span>
+                    <span id="modalTitle">Edit Member</span>
                 </h3>
                 <button class="close-modal" onclick="closeMemberModal()">&times;</button>
             </div>
@@ -1048,27 +1335,48 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
                         <input type="text" class="form-input" id="memberName" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Stage Name</label>
-                        <input type="text" class="form-input" id="memberStageName">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-input" id="memberEmail" required>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Birth Date</label>
-                        <input type="date" class="form-input" id="memberBirthDate">
+                        <label class="form-label">Favorite Member *</label>
+                        <select class="form-select" id="memberFavorite" required>
+                            <option value="">Select...</option>
+                            <option value="Nick Carter">Nick Carter</option>
+                            <option value="Kevin Richardson">Kevin Richardson</option>
+                            <option value="AJ McLean">AJ McLean</option>
+                            <option value="Howie Dorough">Howie Dorough</option>
+                            <option value="Brian Littrell">Brian Littrell</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Status</label>
+                        <label class="form-label">Status *</label>
                         <select class="form-select" id="memberStatus" required>
                             <option value="active">Active</option>
+                            <option value="premium">Premium</option>
                             <option value="inactive">Inactive</option>
-                            <option value="former">Former</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Join Date</label>
+                        <input type="date" class="form-input" id="memberJoinDate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Member Type</label>
+                        <select class="form-select" id="memberType">
+                            <option value="fan">Fan</option>
+                            <option value="superfan">Super Fan</option>
+                            <option value="vip">VIP</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-textarea" id="memberDescription"></textarea>
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" id="memberNotes" placeholder="Additional notes about this member..."></textarea>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-cancel" onclick="closeMemberModal()">Cancel</button>
@@ -1080,13 +1388,250 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
+    <!-- Top Hits Modal -->
+    <div class="modal-overlay" id="topHitsModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-trophy"></i>
+                    <span>Manage Top Hits</span>
+                </h3>
+                <button class="close-modal" onclick="closeTopHitsModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Member</label>
+                <select class="form-select" id="hitsMemberSelect">
+                    <option value="">Select Member...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Add New Hit</label>
+                <div class="form-row">
+                    <input type="text" class="form-input" id="newHitTitle" placeholder="Song title">
+                    <button class="btn-primary" onclick="addNewHit()" style="padding: 12px 20px;">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Current Top Hits</label>
+                <ul class="hits-list" id="hitsList">
+                    <!-- Hits will be loaded dynamically -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeTopHitsModal()">Close</button>
+                <button type="button" class="btn-primary" onclick="saveTopHits()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-history"></i>
+                    <span>Member History Timeline</span>
+                </h3>
+                <button class="close-modal" onclick="closeHistoryModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Member</label>
+                <select class="form-select" id="historyMemberSelect">
+                    <option value="">Select Member...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Add New Event</label>
+                <div class="form-row">
+                    <input type="number" class="form-input" id="eventYear" placeholder="Year" min="1993" max="2026">
+                    <input type="text" class="form-input" id="eventTitle" placeholder="Event title">
+                </div>
+                <textarea class="form-textarea" id="eventDescription" placeholder="Event description..." style="margin-top: 10px;"></textarea>
+                <button class="btn-primary" onclick="addNewEvent()" style="margin-top: 10px; width: 100%;">
+                    <i class="fas fa-plus"></i> Add Event
+                </button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Timeline</label>
+                <div class="history-timeline" id="historyTimeline">
+                    <!-- History items will be loaded dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeHistoryModal()">Close</button>
+                <button type="button" class="btn-primary" onclick="exportHistory()">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-container" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                    <span>Confirm Delete</span>
+                </h3>
+                <button class="close-modal" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <p style="color: #d1d5db; font-size: 1rem; line-height: 1.6;">
+                    Are you sure you want to delete <strong id="deleteItemName" style="color: #ef4444;"></strong>? 
+                    This action cannot be undone.
+                </p>
+            </div>
+            <input type="hidden" id="deleteItemId">
+            <input type="hidden" id="deleteItemType">
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button type="button" class="btn-danger" onclick="confirmDelete()">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Member Functions
-        function openMemberModal() {
-            document.getElementById('memberModalTitle').textContent = 'Add New Member';
-            document.getElementById('memberForm').reset();
-            document.getElementById('memberId').value = '';
-            document.getElementById('memberModal').classList.add('active');
+        // Sample Data - Replace with API calls
+        let members = [
+            { id: 1, name: 'Sarah Johnson', email: 'sarah@email.com', favorite: 'Nick Carter', joinDate: '2023-05-15', status: 'active', type: 'fan', notes: 'Loves I Want It That Way' },
+            { id: 2, name: 'Mike Chen', email: 'mike@email.com', favorite: 'AJ McLean', joinDate: '2023-08-22', status: 'premium', type: 'superfan', notes: 'Attended 3 concerts' },
+            { id: 3, name: 'Emma Wilson', email: 'emma@email.com', favorite: 'Brian Littrell', joinDate: '2024-01-10', status: 'active', type: 'fan', notes: '' },
+            { id: 4, name: 'David Brown', email: 'david@email.com', favorite: 'Kevin Richardson', joinDate: '2022-11-05', status: 'inactive', type: 'fan', notes: 'Inactive since 2024' },
+            { id: 5, name: 'Lisa Garcia', email: 'lisa@email.com', favorite: 'Howie Dorough', joinDate: '2024-02-20', status: 'active', type: 'vip', notes: 'VIP member' }
+        ];
+
+        let topHits = {
+            1: [
+                { rank: 1, title: 'I Want It That Way', album: 'Millennium' },
+                { rank: 2, title: 'Everybody (Backstreet\'s Back)', album: 'Backstreet\'s Back' },
+                { rank: 3, title: 'As Long As You Love Me', album: 'Backstreet\'s Back' }
+            ],
+            2: [
+                { rank: 1, title: 'Larger Than Life', album: 'Millennium' },
+                { rank: 2, title: 'Show Me the Meaning', album: 'Millennium' }
+            ]
+        };
+
+        let historyData = {
+            1: [
+                { year: 2024, title: 'Joined Fan Club', description: 'Became an official Backstreet Boys fan club member' },
+                { year: 2023, title: 'First Concert', description: 'Attended first BSB concert in Orlando' }
+            ]
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMembers();
+            populateMemberSelects();
+        });
+
+        // Load Members Table
+        function loadMembers() {
+            const tbody = document.getElementById('membersTableBody');
+            tbody.innerHTML = '';
+
+            members.forEach(member => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div class="member-info">
+                            <div class="member-avatar">${member.name.split(' ').map(n => n[0]).join('')}</div>
+                            <div>
+                                <div class="member-name">${member.name}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="member-email">${member.email}</td>
+                    <td>${member.favorite}</td>
+                    <td>${member.joinDate}</td>
+                    <td><span class="status-badge status-${member.status}">${member.status}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn edit" onclick="editMember(${member.id})" title="Edit Info">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn hits" onclick="openTopHitsModal(${member.id})" title="Manage Top Hits">
+                                <i class="fas fa-music"></i>
+                            </button>
+                            <button class="action-btn history" onclick="openHistoryModal(${member.id})" title="View History">
+                                <i class="fas fa-history"></i>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteMember(${member.id})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateStats();
+        }
+
+        // Update Stats
+        function updateStats() {
+            document.getElementById('totalMembers').textContent = members.length;
+            document.getElementById('activeMembers').textContent = members.filter(m => m.status === 'active').length;
+            document.getElementById('premiumMembers').textContent = members.filter(m => m.status === 'premium').length;
+        }
+
+        // Populate Member Selects
+        function populateMemberSelects() {
+            const selects = ['hitsMemberSelect', 'historyMemberSelect'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Select Member...</option>';
+                members.forEach(member => {
+                    select.innerHTML += `<option value="${member.id}">${member.name}</option>`;
+                });
+            });
+        }
+
+        // Filter Members
+        function filterMembers() {
+            const search = document.getElementById('memberSearch').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const rows = document.querySelectorAll('#membersTableBody tr');
+
+            rows.forEach(row => {
+                const name = row.querySelector('.member-name').textContent.toLowerCase();
+                const memberStatus = row.querySelector('.status-badge').textContent.toLowerCase();
+                const matchesSearch = name.includes(search);
+                const matchesStatus = !status || memberStatus === status;
+                row.style.display = matchesSearch && matchesStatus ? '' : 'none';
+            });
+        }
+
+        // Member Modal Functions
+        function openMemberModal(memberId = null) {
+            const modal = document.getElementById('memberModal');
+            const title = document.getElementById('modalTitle');
+            
+            if (memberId) {
+                const member = members.find(m => m.id === memberId);
+                document.getElementById('memberId').value = member.id;
+                document.getElementById('memberName').value = member.name;
+                document.getElementById('memberEmail').value = member.email;
+                document.getElementById('memberFavorite').value = member.favorite;
+                document.getElementById('memberStatus').value = member.status;
+                document.getElementById('memberJoinDate').value = member.joinDate;
+                document.getElementById('memberType').value = member.type;
+                document.getElementById('memberNotes').value = member.notes || '';
+                title.textContent = 'Edit Member';
+            } else {
+                document.getElementById('memberForm').reset();
+                document.getElementById('memberId').value = '';
+                title.textContent = 'Add New Member';
+            }
+            
+            modal.classList.add('active');
         }
 
         function closeMemberModal() {
@@ -1094,109 +1639,261 @@ $albums = $albumsStmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         function editMember(id) {
-            // Fetch member data and populate modal
-            fetch(`api/members.php?action=getById&id=${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('memberModalTitle').textContent = 'Edit Member';
-                    document.getElementById('memberId').value = data.member_id;
-                    document.getElementById('memberName').value = data.full_name;
-                    document.getElementById('memberStageName').value = data.stage_name || '';
-                    document.getElementById('memberBirthDate').value = data.birth_date || '';
-                    document.getElementById('memberStatus').value = data.status;
-                    document.getElementById('memberDescription').value = data.description || '';
-                    document.getElementById('memberModal').classList.add('active');
-                });
+            openMemberModal(id);
         }
 
         function saveMember(event) {
             event.preventDefault();
-            
             const id = document.getElementById('memberId').value;
             const memberData = {
-                member_number: parseInt(document.getElementById('memberName').value ? members.length + 1 : 1),
-                full_name: document.getElementById('memberName').value,
-                stage_name: document.getElementById('memberStageName').value,
-                birth_date: document.getElementById('memberBirthDate').value,
+                name: document.getElementById('memberName').value,
+                email: document.getElementById('memberEmail').value,
+                favorite: document.getElementById('memberFavorite').value,
                 status: document.getElementById('memberStatus').value,
-                description: document.getElementById('memberDescription').value
+                joinDate: document.getElementById('memberJoinDate').value,
+                type: document.getElementById('memberType').value,
+                notes: document.getElementById('memberNotes').value
             };
 
-            const url = id ? `api/members.php?id=${id}` : 'api/members.php';
-            const method = id ? 'PUT' : 'POST';
+            // TODO: Replace with API call
+            // Example: fetch('/api/members', { method: 'POST', body: JSON.stringify(memberData) })
+            
+            if (id) {
+                const index = members.findIndex(m => m.id == id);
+                members[index] = { ...members[index], ...memberData };
+                console.log('UPDATE member:', members[index]);
+            } else {
+                const newId = Math.max(...members.map(m => m.id)) + 1;
+                members.push({ id: newId, ...memberData });
+                console.log('CREATE member:', members[members.length - 1]);
+            }
 
-            fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(memberData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Member saved successfully!');
-                    location.reload();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while saving the member.');
+            loadMembers();
+            populateMemberSelects();
+            closeMemberModal();
+        }
+
+        function deleteMember(id) {
+            const member = members.find(m => m.id === id);
+            document.getElementById('deleteItemName').textContent = member.name;
+            document.getElementById('deleteItemId').value = id;
+            document.getElementById('deleteItemType').value = 'member';
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        function confirmDelete() {
+            const id = parseInt(document.getElementById('deleteItemId').value);
+            const type = document.getElementById('deleteItemType').value;
+
+            // TODO: Replace with API call
+            // Example: fetch(`/api/${type}/${id}`, { method: 'DELETE' })
+            
+            if (type === 'member') {
+                members = members.filter(m => m.id !== id);
+                console.log('DELETE member:', id);
+                loadMembers();
+                populateMemberSelects();
+            }
+
+            closeDeleteModal();
+        }
+
+        // Top Hits Modal Functions
+        function openTopHitsModal(memberId = null) {
+            const modal = document.getElementById('topHitsModal');
+            
+            if (memberId) {
+                document.getElementById('hitsMemberSelect').value = memberId;
+            }
+            
+            loadHitsList();
+            modal.classList.add('active');
+        }
+
+        function closeTopHitsModal() {
+            document.getElementById('topHitsModal').classList.remove('active');
+        }
+
+        function loadHitsList() {
+            const memberId = document.getElementById('hitsMemberSelect').value;
+            const list = document.getElementById('hitsList');
+            list.innerHTML = '';
+
+            if (!memberId || !topHits[memberId]) {
+                list.innerHTML = '<li style="color: #9ca3af; text-align: center; padding: 20px;">No hits added yet</li>';
+                return;
+            }
+
+            topHits[memberId].forEach((hit, index) => {
+                const li = document.createElement('li');
+                li.className = 'hit-item';
+                li.innerHTML = `
+                    <div class="hit-rank">${hit.rank}</div>
+                    <div class="hit-details">
+                        <div class="hit-title">${hit.title}</div>
+                        <div class="hit-album">${hit.album}</div>
+                    </div>
+                    <div class="hit-actions">
+                        <button class="hit-action-btn up" onclick="moveHitUp(${memberId}, ${index})" title="Move Up">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button class="hit-action-btn down" onclick="moveHitDown(${memberId}, ${index})" title="Move Down">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                        <button class="hit-action-btn remove" onclick="removeHit(${memberId}, ${index})" title="Remove">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(li);
             });
         }
 
-        function deleteMember(id, name) {
-            if (confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) {
-                fetch(`api/members.php?id=${id}`, {
-                    method: 'DELETE'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Member deleted successfully!');
-                        location.reload();
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while deleting the member.');
-                });
+        function addNewHit() {
+            const memberId = document.getElementById('hitsMemberSelect').value;
+            const title = document.getElementById('newHitTitle').value;
+            
+            if (!memberId || !title) {
+                alert('Please select a member and enter a song title');
+                return;
+            }
+
+            // TODO: Replace with API call
+            if (!topHits[memberId]) topHits[memberId] = [];
+            topHits[memberId].push({
+                rank: topHits[memberId].length + 1,
+                title: title,
+                album: 'Unknown'
+            });
+
+            document.getElementById('newHitTitle').value = '';
+            loadHitsList();
+            console.log('ADD hit for member', memberId, ':', title);
+        }
+
+        function moveHitUp(memberId, index) {
+            if (index > 0) {
+                [topHits[memberId][index], topHits[memberId][index - 1]] = 
+                [topHits[memberId][index - 1], topHits[memberId][index]];
+                topHits[memberId].forEach((hit, i) => hit.rank = i + 1);
+                loadHitsList();
+                console.log('REORDER hits for member', memberId);
             }
         }
 
-        // Album Functions
-        function openAlbumModal() {
-            alert('Album modal functionality - implement similar to member modal');
-        }
-
-        function editAlbum(id) {
-            alert('Edit album functionality for ID: ' + id);
-        }
-
-        function deleteAlbum(id, title) {
-            if (confirm(`Are you sure you want to delete "${title}"? This will also delete all tracks.`)) {
-                fetch(`api/albums.php?id=${id}`, {
-                    method: 'DELETE'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Album deleted successfully!');
-                        location.reload();
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while deleting the album.');
-                });
+        function moveHitDown(memberId, index) {
+            if (index < topHits[memberId].length - 1) {
+                [topHits[memberId][index], topHits[memberId][index + 1]] = 
+                [topHits[memberId][index + 1], topHits[memberId][index]];
+                topHits[memberId].forEach((hit, i) => hit.rank = i + 1);
+                loadHitsList();
+                console.log('REORDER hits for member', memberId);
             }
         }
+
+        function removeHit(memberId, index) {
+            topHits[memberId].splice(index, 1);
+            topHits[memberId].forEach((hit, i) => hit.rank = i + 1);
+            loadHitsList();
+            console.log('REMOVE hit from member', memberId, 'at index', index);
+        }
+
+        function saveTopHits() {
+            // TODO: Replace with API call
+            // Example: fetch('/api/tophits', { method: 'POST', body: JSON.stringify(topHits) })
+            console.log('SAVE top hits:', topHits);
+            alert('Top hits saved successfully!');
+            closeTopHitsModal();
+        }
+
+        // History Modal Functions
+        function openHistoryModal(memberId = null) {
+            const modal = document.getElementById('historyModal');
+            
+            if (memberId) {
+                document.getElementById('historyMemberSelect').value = memberId;
+            }
+            
+            loadHistoryTimeline();
+            modal.classList.add('active');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.remove('active');
+        }
+
+        function loadHistoryTimeline() {
+            const memberId = document.getElementById('historyMemberSelect').value;
+            const timeline = document.getElementById('historyTimeline');
+            timeline.innerHTML = '';
+
+            if (!memberId || !historyData[memberId]) {
+                timeline.innerHTML = '<p style="color: #9ca3af; text-align: center; padding: 20px;">No history events yet</p>';
+                return;
+            }
+
+            historyData[memberId].forEach((event, index) => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="history-year">${event.year}</div>
+                    <div class="history-title">${event.title}</div>
+                    <div class="history-description">${event.description}</div>
+                `;
+                timeline.appendChild(div);
+            });
+        }
+
+        function addNewEvent() {
+            const memberId = document.getElementById('historyMemberSelect').value;
+            const year = document.getElementById('eventYear').value;
+            const title = document.getElementById('eventTitle').value;
+            const description = document.getElementById('eventDescription').value;
+            
+            if (!memberId || !year || !title) {
+                alert('Please select a member, year, and event title');
+                return;
+            }
+
+            // TODO: Replace with API call
+            if (!historyData[memberId]) historyData[memberId] = [];
+            historyData[memberId].push({ year, title, description });
+            historyData[memberId].sort((a, b) => b.year - a.year);
+
+            document.getElementById('eventYear').value = '';
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventDescription').value = '';
+            loadHistoryTimeline();
+            console.log('ADD event for member', memberId, ':', title);
+        }
+
+        function exportHistory() {
+            // TODO: Replace with API call to export data
+            console.log('EXPORT history');
+            alert('History exported successfully!');
+        }
+
+        // Listen for member select changes
+        document.getElementById('hitsMemberSelect').addEventListener('change', loadHitsList);
+        document.getElementById('historyMemberSelect').addEventListener('change', loadHistoryTimeline);
+
+        // Logout Function
+        function logout() {
+            window.location.href = 'dashboard.php?logout=1';
+        }
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
     </script>
 </body>
 </html>
